@@ -28,13 +28,10 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
   const { toast } = useToast();
 
   const handleInterruptSubmit = (value: any) => {
-    // Add system message about the user's choice
-    let responseMessage = "";
+    // Remove the redundant system message about the user's choice
     
     if (currentInterrupt?.type === "choice") {
-      responseMessage = `You selected: ${value}`;
-      
-      // Update canvas state based on selection
+      // Update canvas state based on selection without adding a chat message
       if (value.toLowerCase().includes("revenue")) {
         handleCanvasAction({
           type: 'visualization',
@@ -77,9 +74,7 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
         ]);
       }, 1000);
     } else if (currentInterrupt?.type === "confirmation") {
-      responseMessage = "Confirmation received";
-      
-      // If it's a date confirmation, update the canvas state
+      // If it's a date confirmation, update the canvas state without adding a chat message
       if (currentInterrupt.title.includes("Date")) {
         // Update the canvas with the confirmed date
         handleCanvasAction({
@@ -92,16 +87,6 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
         });
       }
     }
-    
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: uuidv4(),
-        content: responseMessage,
-        sender: "assistant",
-        timestamp: new Date(),
-      },
-    ]);
     
     setInterruptVisible(false);
     setCurrentInterrupt(null);

@@ -50,10 +50,15 @@ export function useCanvasState(
       }));
     }
 
-    // Add a message to the chat if the action came from the canvas
-    if (action.source === 'canvas') {
+    // Only add significant actions to the chat, skip UI state updates
+    if (action.source === 'canvas' && 
+        (action.type === 'visualization' || 
+         (action.type === 'position_change' && action.payload.name) || 
+         (action.type === 'date_selection' && action.payload.confirmed))) {
+      
       const messageContent = canvasActionToMessage(action);
       
+      // Only add the message if it's important and not just a UI state update
       setMessages(prev => [
         ...prev,
         {
@@ -64,10 +69,16 @@ export function useCanvasState(
         },
       ]);
       
-      // Show a toast notification
+      // Show a toast notification instead for less important updates
       toast({
         title: "Canvas update",
         description: messageContent,
+      });
+    } else if (action.source === 'canvas') {
+      // For less important updates, just show a toast without adding to chat
+      toast({
+        title: "Canvas updated",
+        description: canvasActionToMessage(action),
       });
     }
   }, [setMessages, canvasActionToMessage, toast]);
