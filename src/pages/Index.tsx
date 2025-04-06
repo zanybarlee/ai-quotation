@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Canvas from "@/components/Canvas";
@@ -13,25 +12,21 @@ import { useCanvasState } from "@/hooks/useCanvasState";
 import { useInterrupts } from "@/hooks/useInterrupts";
 import { useAIInteractions } from "@/hooks/useAIInteractions";
 import { MessageType } from "@/components/ChatMessage";
-
 const Index = () => {
-  const [messages, setMessages] = useState<MessageType[]>([
-    {
-      id: "welcome",
-      content: "Welcome to Canvas-UX! I'm your AI assistant. How can I help you today?",
-      sender: "assistant",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<MessageType[]>([{
+    id: "welcome",
+    content: "Welcome to Canvas-UX! I'm your AI assistant. How can I help you today?",
+    sender: "assistant",
+    timestamp: new Date()
+  }]);
   const [isCanvasOpen, setIsCanvasOpen] = useState(false);
-  
+
   // Initialize hooks
-  const { 
-    canvasState, 
+  const {
+    canvasState,
     setCanvasState,
-    handleCanvasAction 
+    handleCanvasAction
   } = useCanvasState(setMessages, canvasActionToMessage);
-  
   const {
     currentInterrupt,
     setCurrentInterrupt,
@@ -40,96 +35,44 @@ const Index = () => {
     triggerInterrupt,
     handleCanvasInterrupt
   } = useInterrupts();
-  
   const {
     isLoading,
     handleSendMessage
-  } = useAIInteractions(
-    setMessages,
-    setIsCanvasOpen,
-    handleCanvasAction,
-    setCanvasState,
-    triggerInterrupt,
-    messageToCanvasAction
-  );
-
-  return (
-    <div className="flex flex-col h-screen bg-gray-50">
+  } = useAIInteractions(setMessages, setIsCanvasOpen, handleCanvasAction, setCanvasState, triggerInterrupt, messageToCanvasAction);
+  return <div className="flex flex-col h-screen bg-gray-50">
       <header className="border-b bg-white p-4 shadow-sm">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <PanelRightOpen className="h-6 w-6 text-purple-500" />
-            <h1 className="text-xl font-bold text-slate-800">Canvas-UX Demo</h1>
+            <h1 className="text-xl font-bold text-slate-800">KYI AI for Facility Management</h1>
           </div>
           <CanvasToggle isOpen={isCanvasOpen} onClick={() => setIsCanvasOpen(!isCanvasOpen)} />
         </div>
       </header>
 
       <main className="flex flex-1 overflow-hidden">
-        {isCanvasOpen ? (
-          <ResizablePanelGroup 
-            direction="horizontal" 
-            className="w-full"
-          >
+        {isCanvasOpen ? <ResizablePanelGroup direction="horizontal" className="w-full">
             <ResizablePanel defaultSize={60} minSize={30}>
-              <ChatContainer 
-                messages={messages}
-                setMessages={setMessages}
-                isLoading={isLoading}
-                handleSendMessage={handleSendMessage}
-                interruptVisible={interruptVisible}
-                setInterruptVisible={setInterruptVisible}
-                currentInterrupt={currentInterrupt}
-                setCurrentInterrupt={setCurrentInterrupt}
-                handleCanvasAction={handleCanvasAction}
-              />
+              <ChatContainer messages={messages} setMessages={setMessages} isLoading={isLoading} handleSendMessage={handleSendMessage} interruptVisible={interruptVisible} setInterruptVisible={setInterruptVisible} currentInterrupt={currentInterrupt} setCurrentInterrupt={setCurrentInterrupt} handleCanvasAction={handleCanvasAction} />
             </ResizablePanel>
             
             <ResizableHandle withHandle />
             
             <ResizablePanel defaultSize={40} minSize={20}>
-              <Canvas 
-                isOpen={isCanvasOpen} 
-                onClose={() => setIsCanvasOpen(false)}
-                title="Interactive Workspace"
-              >
-                <CanvasExample 
-                  onInterrupt={handleCanvasInterrupt} 
-                  onCanvasAction={handleCanvasAction}
-                  canvasState={canvasState}
-                />
+              <Canvas isOpen={isCanvasOpen} onClose={() => setIsCanvasOpen(false)} title="Interactive Workspace">
+                <CanvasExample onInterrupt={handleCanvasInterrupt} onCanvasAction={handleCanvasAction} canvasState={canvasState} />
               </Canvas>
             </ResizablePanel>
-          </ResizablePanelGroup>
-        ) : (
-          <div className="flex flex-col flex-1">
-            <ChatContainer 
-              messages={messages}
-              setMessages={setMessages}
-              isLoading={isLoading}
-              handleSendMessage={handleSendMessage}
-              interruptVisible={interruptVisible}
-              setInterruptVisible={setInterruptVisible}
-              currentInterrupt={currentInterrupt}
-              setCurrentInterrupt={setCurrentInterrupt}
-              handleCanvasAction={handleCanvasAction}
-            />
-          </div>
-        )}
+          </ResizablePanelGroup> : <div className="flex flex-col flex-1">
+            <ChatContainer messages={messages} setMessages={setMessages} isLoading={isLoading} handleSendMessage={handleSendMessage} interruptVisible={interruptVisible} setInterruptVisible={setInterruptVisible} currentInterrupt={currentInterrupt} setCurrentInterrupt={setCurrentInterrupt} handleCanvasAction={handleCanvasAction} />
+          </div>}
       </main>
 
-      {!isCanvasOpen && (
-        <div className="fixed bottom-20 right-6">
-          <Button 
-            onClick={() => setIsCanvasOpen(true)}
-            className="rounded-full bg-purple-500 hover:bg-purple-600 shadow-lg p-3 h-auto"
-          >
+      {!isCanvasOpen && <div className="fixed bottom-20 right-6">
+          <Button onClick={() => setIsCanvasOpen(true)} className="rounded-full bg-purple-500 hover:bg-purple-600 shadow-lg p-3 h-auto">
             <ArrowRightCircle className="h-6 w-6" />
           </Button>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 };
-
 export default Index;
