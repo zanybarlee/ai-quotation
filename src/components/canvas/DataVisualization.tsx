@@ -197,7 +197,13 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({
             size="sm"
             onClick={() => onChartTypeChange('area')}
           >
-            <RechartsPrimitive.Area className="h-4 w-4 mr-1" dataKey="value" /> Area
+            {/* Fix: Use a different icon or properly configure the Area component */}
+            <svg className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 18H21V20H3V18Z" fill="currentColor"/>
+              <path d="M3 4H21V6H3V4Z" fill="currentColor"/>
+              <path d="M21 16H3L7 10L11 14L15 6L21 16Z" fill="currentColor"/>
+            </svg>
+            Area
           </Button>
         </div>
         
