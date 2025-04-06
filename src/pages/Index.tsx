@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Canvas from "@/components/Canvas";
@@ -13,7 +12,6 @@ import { useCanvasState } from "@/hooks/useCanvasState";
 import { useInterrupts } from "@/hooks/useInterrupts";
 import { useAIInteractions } from "@/hooks/useAIInteractions";
 import { MessageType } from "@/components/ChatMessage";
-
 const Index = () => {
   const [messages, setMessages] = useState<MessageType[]>([{
     id: "welcome",
@@ -41,17 +39,12 @@ const Index = () => {
     isLoading,
     handleSendMessage
   } = useAIInteractions(setMessages, setIsCanvasOpen, handleCanvasAction, setCanvasState, triggerInterrupt, messageToCanvasAction);
-
   return <div className="flex flex-col h-screen bg-gray-50">
       <header className="border-b bg-white p-4 shadow-sm">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img 
-              src="/lovable-uploads/49e2a6ff-414f-472d-b350-750831078cc0.png" 
-              alt="Kim Yew Integrated Logo" 
-              className="h-10"
-            />
-            <h1 className="text-xl font-bold text-slate-800">Facility Management</h1>
+            <img src="/lovable-uploads/49e2a6ff-414f-472d-b350-750831078cc0.png" alt="Kim Yew Integrated Logo" className="h-10" />
+            <h1 className="text-xl font-bold text-slate-800">GenAI for Facility Management</h1>
           </div>
           <CanvasToggle isOpen={isCanvasOpen} onClick={() => setIsCanvasOpen(!isCanvasOpen)} />
         </div>
