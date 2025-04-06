@@ -38,7 +38,8 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           payload: { 
             type: 'bar',
             description: 'Revenue visualization',
-            dataType: 'revenue'
+            dataType: 'revenue',
+            silent: true
           },
           source: 'chat'
         });
@@ -48,7 +49,8 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           payload: { 
             type: 'line',
             description: 'User growth visualization',
-            dataType: 'users'
+            dataType: 'users',
+            silent: true
           },
           source: 'chat'
         });
@@ -58,7 +60,8 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           payload: { 
             type: 'area',
             description: 'Performance metrics visualization',
-            dataType: 'conversion'
+            dataType: 'conversion',
+            silent: true
           },
           source: 'chat'
         });
@@ -77,15 +80,26 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
         ]);
       }, 1000);
     } else if (currentInterrupt?.type === "confirmation") {
-      // If it's a date confirmation, update the canvas state without adding a chat message
-      if (currentInterrupt.title.includes("Date")) {
+      // If it's a location or date confirmation, update the canvas state without adding a chat message
+      if (currentInterrupt.title.includes("Location")) {
+        // Update the canvas with the confirmed location
+        handleCanvasAction({
+          type: 'position_change',
+          payload: { 
+            name: 'Confirmed location',
+            lat: 34.05, 
+            lng: -118.25,
+            silent: true // Keep silent to avoid chat message
+          },
+          source: 'chat'
+        });
+      } else if (currentInterrupt.title.includes("Date")) {
         // Update the canvas with the confirmed date
         handleCanvasAction({
           type: 'date_selection',
           payload: { 
             date: new Date(),
-            // Don't mark as confirmed to avoid chat message
-            silent: true
+            silent: true // Keep silent to avoid chat message
           },
           source: 'chat'
         });

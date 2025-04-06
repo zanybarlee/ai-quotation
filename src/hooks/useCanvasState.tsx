@@ -51,11 +51,16 @@ export function useCanvasState(
     }
 
     // Only add action to the chat if it was explicitly called from the chat
-    // or if it's a critically important one that requires user attention
+    // AND it's not a silent action or one of the types we want to exclude
     const isFromChatInteraction = action.source === 'chat';
+    const isSilent = action.payload?.silent === true;
     
-    // For all other actions, just show a toast
-    if (isFromChatInteraction) {
+    // Define which action types should never generate chat messages
+    const excludedTypes = ['visualization', 'date_selection', 'position_change'];
+    const shouldExclude = excludedTypes.includes(action.type);
+    
+    // Only add to chat if from chat interaction, not silent, and not excluded
+    if (isFromChatInteraction && !isSilent && !shouldExclude) {
       const messageContent = canvasActionToMessage(action);
       
       setMessages(prev => [
