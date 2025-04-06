@@ -1,49 +1,59 @@
 
 import React from "react";
-import { cn } from "@/lib/utils";
-import { Avatar } from "@/components/ui/avatar";
-import { Bot, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { FileText, User } from "lucide-react";
 
-export type MessageType = {
+export interface MessageType {
   id: string;
   content: string;
   sender: "user" | "assistant";
   timestamp: Date;
-};
+}
 
 interface ChatMessageProps {
   message: MessageType;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
-  const isUser = message.sender === "user";
+  const isUserMessage = message.sender === "user";
+  
+  // Check if the message is related to a quotation
+  const isQuotationRelated = 
+    message.content.toLowerCase().includes("quotation") || 
+    message.content.toLowerCase().includes("quote") ||
+    message.content.toLowerCase().includes("rfp") ||
+    message.content.toLowerCase().includes("proposal");
 
   return (
-    <div className={cn("flex w-full gap-3 p-4", isUser ? "justify-end" : "justify-start")}>
-      {!isUser && (
-        <Avatar className="h-8 w-8 bg-purple-100 flex items-center justify-center">
-          <Bot className="h-4 w-4 text-purple-600" />
+    <div className={`flex gap-2 mb-4 ${isUserMessage ? "justify-end" : "justify-start"}`}>
+      {!isUserMessage && (
+        <Avatar className="h-8 w-8">
+          <AvatarImage src="/placeholder.svg" />
+          <AvatarFallback>AI</AvatarFallback>
         </Avatar>
       )}
-      <div
-        className={cn(
-          "rounded-lg px-4 py-2 max-w-[80%]",
-          isUser
-            ? "bg-purple-500 text-white rounded-tr-none"
-            : "bg-gray-100 text-gray-800 rounded-tl-none"
-        )}
-      >
-        <p className="whitespace-pre-wrap">{message.content}</p>
-        <div className={cn("text-xs mt-1", isUser ? "text-purple-200" : "text-gray-500")}>
-          {new Date(message.timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </div>
-      </div>
-      {isUser && (
-        <Avatar className="h-8 w-8 bg-purple-500 flex items-center justify-center">
-          <User className="h-4 w-4 text-white" />
+
+      <Card className={`max-w-[85%] ${isUserMessage ? "bg-primary text-primary-foreground" : ""}`}>
+        <CardContent className="p-3">
+          <div className="flex items-start gap-2">
+            {isQuotationRelated && !isUserMessage && (
+              <FileText className="h-4 w-4 mt-1 text-muted-foreground" />
+            )}
+            <div>
+              <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {message.timestamp.toLocaleTimeString()}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {isUserMessage && (
+        <Avatar className="h-8 w-8">
+          <AvatarImage src="/placeholder.svg" />
+          <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
         </Avatar>
       )}
     </div>

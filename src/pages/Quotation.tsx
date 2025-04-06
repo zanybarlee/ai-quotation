@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { QuotationVersion } from "@/types/quotation";
 
 const Quotation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("editor");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -20,6 +21,24 @@ const Quotation = () => {
   const [rfpContent, setRfpContent] = useState<string | null>(null);
   const [versions, setVersions] = useState<QuotationVersion[]>([]);
   const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
+
+  // Check if we have input from the chat
+  useEffect(() => {
+    const state = location.state as { inputText?: string; fromChat?: boolean } | null;
+    
+    if (state?.inputText) {
+      setInputContent(state.inputText);
+      
+      // If we came from chat, automatically generate the RFP
+      if (state.fromChat) {
+        const timeoutId = setTimeout(() => {
+          handleGenerate();
+        }, 500);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [location.state]);
 
   const handleGenerate = async () => {
     if (!inputContent.trim()) {
