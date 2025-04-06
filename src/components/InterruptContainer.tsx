@@ -38,7 +38,7 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           payload: { 
             type: 'bar',
             description: 'Revenue visualization',
-            confirmed: true // Mark this as a confirmed action that should appear in chat
+            dataType: 'revenue'
           },
           source: 'chat'
         });
@@ -48,7 +48,7 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           payload: { 
             type: 'line',
             description: 'User growth visualization',
-            confirmed: true
+            dataType: 'users'
           },
           source: 'chat'
         });
@@ -58,7 +58,7 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           payload: { 
             type: 'area',
             description: 'Performance metrics visualization',
-            confirmed: true
+            dataType: 'conversion'
           },
           source: 'chat'
         });
@@ -84,7 +84,8 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           type: 'date_selection',
           payload: { 
             date: new Date(),
-            confirmed: true
+            // Don't mark as confirmed to avoid chat message
+            silent: true
           },
           source: 'chat'
         });

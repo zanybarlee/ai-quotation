@@ -50,13 +50,12 @@ export function useCanvasState(
       }));
     }
 
-    // Determine if this is an important action that should be added to the chat
-    // Only add actions that are explicit confirmations
-    const isImportantAction = 
-      action.source === 'chat' || // Actions from chat are always important
-      (action.payload.confirmed === true); // Only confirmed actions are important
+    // Only add action to the chat if it was explicitly called from the chat
+    // or if it's a critically important one that requires user attention
+    const isFromChatInteraction = action.source === 'chat';
     
-    if (isImportantAction) {
+    // For all other actions, just show a toast
+    if (isFromChatInteraction) {
       const messageContent = canvasActionToMessage(action);
       
       setMessages(prev => [
@@ -68,19 +67,13 @@ export function useCanvasState(
           timestamp: new Date(),
         },
       ]);
-      
-      // Also show a toast notification
-      toast({
-        title: "Canvas update",
-        description: messageContent,
-      });
-    } else {
-      // For all other updates, just show a toast without adding to chat
-      toast({
-        title: "Canvas updated",
-        description: canvasActionToMessage(action),
-      });
     }
+    
+    // Always show a toast notification for visual feedback
+    toast({
+      title: "Canvas updated",
+      description: canvasActionToMessage(action),
+    });
   }, [setMessages, canvasActionToMessage, toast]);
 
   return { canvasState, setCanvasState, handleCanvasAction };

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -181,21 +180,69 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({
           <Button 
             variant={chartType === 'bar' ? 'default' : 'outline'} 
             size="sm"
-            onClick={() => onChartTypeChange('bar')}
+            onClick={() => {
+              onChartTypeChange('bar');
+              
+              // Notify about chart type change but keep silent
+              if (onCanvasAction) {
+                onCanvasAction({
+                  type: 'visualization',
+                  payload: { 
+                    type: 'bar',
+                    dataType: dataType,
+                    description: `Changed to bar chart for ${dataType}`,
+                    silent: true // Keep it silent in the chat
+                  },
+                  source: 'canvas'
+                });
+              }
+            }}
           >
             <BarChart className="h-4 w-4 mr-1" /> Bar
           </Button>
           <Button 
             variant={chartType === 'line' ? 'default' : 'outline'} 
             size="sm"
-            onClick={() => onChartTypeChange('line')}
+            onClick={() => {
+              onChartTypeChange('line');
+              
+              // Notify about chart type change but keep silent
+              if (onCanvasAction) {
+                onCanvasAction({
+                  type: 'visualization',
+                  payload: { 
+                    type: 'line',
+                    dataType: dataType,
+                    description: `Changed to line chart for ${dataType}`,
+                    silent: true // Keep it silent in the chat
+                  },
+                  source: 'canvas'
+                });
+              }
+            }}
           >
             <LineChart className="h-4 w-4 mr-1" /> Line
           </Button>
           <Button 
             variant={chartType === 'area' ? 'default' : 'outline'} 
             size="sm"
-            onClick={() => onChartTypeChange('area')}
+            onClick={() => {
+              onChartTypeChange('area');
+              
+              // Notify about chart type change but keep silent
+              if (onCanvasAction) {
+                onCanvasAction({
+                  type: 'visualization',
+                  payload: { 
+                    type: 'area',
+                    dataType: dataType,
+                    description: `Changed to area chart for ${dataType}`,
+                    silent: true // Keep it silent in the chat
+                  },
+                  source: 'canvas'
+                });
+              }
+            }}
           >
             {/* Fix: Use a different icon or properly configure the Area component */}
             <svg className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -224,33 +271,92 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({
           <Button 
             variant={dataType === 'sales' ? 'default' : 'outline'} 
             size="sm" 
-            onClick={() => onDataTypeChange('sales')}
+            onClick={() => {
+              onDataTypeChange('sales');
+              
+              // Notify about data type change but keep silent
+              if (onCanvasAction) {
+                onCanvasAction({
+                  type: 'data_update',
+                  payload: { 
+                    dataType: 'sales',
+                    description: 'Switched to sales data',
+                    silent: true
+                  },
+                  source: 'canvas'
+                });
+              }
+            }}
           >
             Sales
           </Button>
+          {/* Repeat for other data type buttons */}
           <Button 
             variant={dataType === 'revenue' ? 'default' : 'outline'} 
             size="sm" 
-            onClick={() => onDataTypeChange('revenue')}
+            onClick={() => {
+              onDataTypeChange('revenue');
+              
+              if (onCanvasAction) {
+                onCanvasAction({
+                  type: 'data_update',
+                  payload: { 
+                    dataType: 'revenue',
+                    description: 'Switched to revenue data',
+                    silent: true
+                  },
+                  source: 'canvas'
+                });
+              }
+            }}
           >
             Revenue
           </Button>
           <Button 
             variant={dataType === 'users' ? 'default' : 'outline'} 
             size="sm" 
-            onClick={() => onDataTypeChange('users')}
+            onClick={() => {
+              onDataTypeChange('users');
+              
+              if (onCanvasAction) {
+                onCanvasAction({
+                  type: 'data_update',
+                  payload: { 
+                    dataType: 'users',
+                    description: 'Switched to users data',
+                    silent: true
+                  },
+                  source: 'canvas'
+                });
+              }
+            }}
           >
             Users
           </Button>
           <Button 
             variant={dataType === 'conversion' ? 'default' : 'outline'} 
             size="sm" 
-            onClick={() => onDataTypeChange('conversion')}
+            onClick={() => {
+              onDataTypeChange('conversion');
+              
+              if (onCanvasAction) {
+                onCanvasAction({
+                  type: 'data_update',
+                  payload: { 
+                    dataType: 'conversion',
+                    description: 'Switched to conversion data',
+                    silent: true
+                  },
+                  source: 'canvas'
+                });
+              }
+            }}
           >
             Conversion
           </Button>
         </div>
         
+        {/* ... keep existing code (threshold slider) the same */}
         <div className="space-y-2 pt-2">
           <div className="flex justify-between">
             <Label htmlFor="threshold">Threshold: {sliderValue[0]}%</Label>
@@ -275,14 +381,15 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({
           onClick={() => {
             onInterrupt?.("analysis", { type: "visualize" });
             
-            // Also notify about the action
+            // When requested from a button click, make it silent too
             if (onCanvasAction) {
               onCanvasAction({
                 type: 'visualization',
                 payload: { 
                   type: chartType,
                   dataType: dataType,
-                  description: `Requested ${dataType} analysis update`
+                  description: `Requested ${dataType} analysis update`,
+                  silent: true
                 },
                 source: 'canvas'
               });
