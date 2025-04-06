@@ -2,7 +2,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
-import { Bot, User, FileText } from "lucide-react";
+import { Bot, User, FileText, Quote } from "lucide-react";
 
 export type MessageType = {
   id: string;
@@ -20,7 +20,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
   // Highlight quotation-related terms in the message
   const highlightQuotationTerms = (text: string) => {
-    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate"];
+    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate", "pricing"];
     let highlightedText = text;
     
     terms.forEach(term => {
@@ -36,7 +36,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   // Check if message is quotation-related
   const isQuotationRelated = () => {
     const lowerContent = message.content.toLowerCase();
-    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate"];
+    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate", "pricing"];
     return terms.some(term => lowerContent.includes(term));
   };
 
@@ -59,7 +59,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           <div className="flex items-start gap-2">
             <p className="whitespace-pre-wrap">{message.content}</p>
             {isQuotationRelated() && (
-              <FileText className="h-4 w-4 text-white mt-1 flex-shrink-0" />
+              <Quote className="h-4 w-4 text-white mt-1 flex-shrink-0" />
             )}
           </div>
         ) : (
@@ -67,7 +67,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             {highlightQuotationTerms(message.content)}
             {isQuotationRelated() && (
               <div className="mt-2 text-xs text-purple-600 italic flex items-center gap-1">
-                <FileText className="h-3 w-3" />
+                <Quote className="h-3 w-3" />
                 <span>Quotation features available</span>
               </div>
             )}

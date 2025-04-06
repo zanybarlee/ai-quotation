@@ -10,45 +10,19 @@ export function useCanvasState(
   canvasActionToMessage: (action: CanvasAction) => string
 ) {
   const [canvasState, setCanvasState] = useState<CanvasState>({
-    activeTab: "data",
-    visualizationType: "bar",
-    dataType: "revenue",
+    activeTab: "quotation",
+    quotationData: {
+      requirements: "",
+      sorItems: [],
+      previousQuotes: ["Basic Website", "Enterprise Portal", "E-commerce Solution"],
+    }
   });
   const { toast } = useToast();
 
   // Handle canvas actions
   const handleCanvasAction = useCallback((action: CanvasAction) => {
     // Update canvas state based on the action
-    if (action.type === 'visualization') {
-      setCanvasState(prev => ({
-        ...prev,
-        activeTab: 'data',
-        visualizationType: action.payload.type,
-        dataType: action.payload.dataType || prev.dataType
-      }));
-    } else if (action.type === 'position_change') {
-      setCanvasState(prev => ({
-        ...prev,
-        activeTab: 'map',
-        selectedLocation: action.payload
-      }));
-    } else if (action.type === 'date_selection') {
-      setCanvasState(prev => ({
-        ...prev,
-        activeTab: 'calendar',
-        selectedDate: action.payload.date
-      }));
-    } else if (action.type === 'data_update') {
-      setCanvasState(prev => ({
-        ...prev,
-        dataFilters: {
-          ...(prev.dataFilters || {}),
-          [action.payload.filter]: action.payload.value
-        },
-        // Update dataType if the action includes it
-        ...(action.payload.dataType ? { dataType: action.payload.dataType } : {})
-      }));
-    } else if (action.type === 'quotation_generation') {
+    if (action.type === 'quotation_generation') {
       setCanvasState(prev => ({
         ...prev,
         activeTab: 'quotation',
@@ -63,23 +37,17 @@ export function useCanvasState(
     }
 
     // Only add action to the chat if it was explicitly called from the chat
-    // AND it's not a silent action or one of the types we want to exclude
+    // AND it's not a silent action
     const isFromChatInteraction = action.source === 'chat';
     const isSilent = action.payload?.silent === true;
     
-    // Define which action types should never generate chat messages
-    const excludedTypes = ['visualization', 'date_selection', 'position_change'];
-    const shouldExclude = excludedTypes.includes(action.type);
-    
     // Add to chat if specific conditions are met
-    if (isFromChatInteraction && !isSilent && !shouldExclude) {
+    if (isFromChatInteraction && !isSilent && action.type === 'quotation_generation') {
       const messageContent = canvasActionToMessage(action);
       
       // For quotation_generation, add some additional helpful text
       let enhancedMessage = messageContent;
-      if (action.type === 'quotation_generation') {
-        enhancedMessage += "\n\nI've opened the quotation module in the canvas. You can now customize the requirements and select items from our Schedule of Rates.";
-      }
+      enhancedMessage += "\n\nI've opened the quotation module in the canvas. You can now customize the requirements and select items from our Schedule of Rates.";
       
       setMessages(prev => [
         ...prev,
@@ -94,7 +62,7 @@ export function useCanvasState(
     
     // Always show a toast notification for visual feedback
     toast({
-      title: "Canvas updated",
+      title: "Quotation updated",
       description: canvasActionToMessage(action),
     });
   }, [setMessages, canvasActionToMessage, toast]);
