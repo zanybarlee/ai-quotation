@@ -12,6 +12,7 @@ export interface CanvasState {
   selectedLocation?: { lat: number; lng: number; name?: string };
   selectedDate?: Date;
   dataFilters?: Record<string, any>;
+  dataType?: 'sales' | 'users' | 'revenue' | 'conversion';
 }
 
 // Helper function to convert canvas actions to human-readable messages
@@ -22,7 +23,7 @@ export const canvasActionToMessage = (action: CanvasAction): string => {
     case 'selection':
       return `Selected ${action.payload.item} ${action.payload.description ? `(${action.payload.description})` : ''}`;
     case 'visualization':
-      return `Changed visualization to ${action.payload.type}`;
+      return `Changed visualization to ${action.payload.type} ${action.payload.dataType ? `for ${action.payload.dataType} data` : ''}`;
     case 'position_change':
       return `Moved to location: ${action.payload.name || 'New location'}`;
     case 'date_selection':
@@ -36,14 +37,29 @@ export const canvasActionToMessage = (action: CanvasAction): string => {
 export const messageToCanvasAction = (message: string): CanvasAction | null => {
   const lowerMessage = message.toLowerCase();
   
+  // Handle visualization requests
   if (lowerMessage.includes('chart') || lowerMessage.includes('graph') || lowerMessage.includes('data')) {
+    // Determine visualization type
+    const visualType = lowerMessage.includes('bar') ? 'bar' : 
+                       lowerMessage.includes('line') ? 'line' : 
+                       lowerMessage.includes('area') ? 'area' : 'default';
+    
+    // Determine data type
+    let dataType = 'revenue';
+    if (lowerMessage.includes('sales')) {
+      dataType = 'sales';
+    } else if (lowerMessage.includes('user')) {
+      dataType = 'users';
+    } else if (lowerMessage.includes('conversion')) {
+      dataType = 'conversion';
+    }
+    
     return {
       type: 'visualization',
       payload: { 
-        type: lowerMessage.includes('bar') ? 'bar' : 
-              lowerMessage.includes('line') ? 'line' : 
-              lowerMessage.includes('area') ? 'area' : 'default',
-        description: 'Visualization from chat request'
+        type: visualType,
+        dataType: dataType,
+        description: `${visualType} chart for ${dataType} data`
       },
       source: 'chat'
     };

@@ -11,6 +11,8 @@ export function useCanvasState(
 ) {
   const [canvasState, setCanvasState] = useState<CanvasState>({
     activeTab: "data",
+    visualizationType: "bar",
+    dataType: "revenue",
   });
   const { toast } = useToast();
 
@@ -21,7 +23,8 @@ export function useCanvasState(
       setCanvasState(prev => ({
         ...prev,
         activeTab: 'data',
-        visualizationType: action.payload.type
+        visualizationType: action.payload.type,
+        dataType: action.payload.dataType || prev.dataType
       }));
     } else if (action.type === 'position_change') {
       setCanvasState(prev => ({
@@ -41,7 +44,9 @@ export function useCanvasState(
         dataFilters: {
           ...(prev.dataFilters || {}),
           [action.payload.filter]: action.payload.value
-        }
+        },
+        // Update dataType if the action includes it
+        ...(action.payload.dataType ? { dataType: action.payload.dataType } : {})
       }));
     }
 
