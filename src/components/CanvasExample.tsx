@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AreaChart, ChartContainer, BarChart } from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Circle, Edit, Map, MapPin, RefreshCw } from "lucide-react";
+import * as RechartsPrimitive from "recharts";
 
 // Mock data for the charts
 const data = [
@@ -47,11 +48,27 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({ interruptType, onInterrup
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="h-[200px]">
-                <ChartContainer
-                  title="Monthly Metrics"
-                  series={[{ name: "Value", type: "area", data: data.map(d => d.value) }]}
-                  categories={data.map(d => d.month)}
-                />
+                <ChartContainer 
+                  config={{
+                    value: { label: "Value", color: "#8884d8" }
+                  }}
+                >
+                  <RechartsPrimitive.ResponsiveContainer width="100%" height="100%">
+                    <RechartsPrimitive.AreaChart data={data}>
+                      <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+                      <RechartsPrimitive.XAxis dataKey="month" />
+                      <RechartsPrimitive.YAxis />
+                      <RechartsPrimitive.Tooltip />
+                      <RechartsPrimitive.Area 
+                        type="monotone" 
+                        dataKey="value" 
+                        fill="#8884d8" 
+                        stroke="#8884d8" 
+                        fillOpacity={0.3} 
+                      />
+                    </RechartsPrimitive.AreaChart>
+                  </RechartsPrimitive.ResponsiveContainer>
+                </ChartContainer>
               </div>
               
               <div className="space-y-2 pt-2">
