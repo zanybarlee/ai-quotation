@@ -50,15 +50,15 @@ export function useCanvasState(
       }));
     }
 
-    // Only add truly significant actions to the chat and ignore silent ones
-    if (action.source === 'canvas' && 
-        !action.payload.silent && 
-        (action.type === 'visualization' || 
-         (action.type === 'date_selection' && action.payload.confirmed))) {
-      
+    // Determine if this is an important action that should be added to the chat
+    // Only add actions that are explicit confirmations
+    const isImportantAction = 
+      action.source === 'chat' || // Actions from chat are always important
+      (action.payload.confirmed === true); // Only confirmed actions are important
+    
+    if (isImportantAction) {
       const messageContent = canvasActionToMessage(action);
       
-      // Only add the message if it's important and not just a UI state update
       setMessages(prev => [
         ...prev,
         {
@@ -69,13 +69,13 @@ export function useCanvasState(
         },
       ]);
       
-      // Show a toast notification for important updates
+      // Also show a toast notification
       toast({
         title: "Canvas update",
         description: messageContent,
       });
-    } else if (action.source === 'canvas') {
-      // For less important updates, just show a toast without adding to chat
+    } else {
+      // For all other updates, just show a toast without adding to chat
       toast({
         title: "Canvas updated",
         description: canvasActionToMessage(action),

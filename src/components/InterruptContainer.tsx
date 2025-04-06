@@ -37,7 +37,8 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           type: 'visualization',
           payload: { 
             type: 'bar',
-            description: 'Revenue visualization'
+            description: 'Revenue visualization',
+            confirmed: true // Mark this as a confirmed action that should appear in chat
           },
           source: 'chat'
         });
@@ -46,7 +47,8 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           type: 'visualization',
           payload: { 
             type: 'line',
-            description: 'User growth visualization'
+            description: 'User growth visualization',
+            confirmed: true
           },
           source: 'chat'
         });
@@ -55,7 +57,8 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           type: 'visualization',
           payload: { 
             type: 'area',
-            description: 'Performance metrics visualization'
+            description: 'Performance metrics visualization',
+            confirmed: true
           },
           source: 'chat'
         });

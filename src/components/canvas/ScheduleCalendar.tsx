@@ -37,7 +37,7 @@ const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
                 type: 'date_selection',
                 payload: { 
                   date: newDate,
-                  silent: true, // Add this flag to indicate it shouldn't appear in chat
+                  silent: true, // Always silent for regular selections
                   description: `Selected ${newDate.toLocaleDateString()}`
                 },
                 source: 'canvas'
@@ -55,13 +55,13 @@ const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
           onClick={() => {
             onInterrupt?.("date", { selected: date });
             
-            // Also notify about the explicit confirmation
+            // Explicit confirmation should be shown in the chat
             if (onCanvasAction && date) {
               onCanvasAction({
                 type: 'date_selection',
                 payload: { 
                   date: date,
-                  confirmed: true,
+                  confirmed: true, // Explicitly confirmed actions are important
                   description: `Confirmed date: ${date.toLocaleDateString()}`
                 },
                 source: 'canvas'
