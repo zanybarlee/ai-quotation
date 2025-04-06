@@ -1,0 +1,145 @@
+
+import React from "react";
+import InterruptHandler, { InterruptType } from "@/components/InterruptHandler";
+import { v4 as uuidv4 } from "uuid";
+import { MessageType } from "@/components/ChatMessage";
+import { useToast } from "@/components/ui/use-toast";
+import { CanvasAction } from "@/utils/canvasInteraction";
+
+interface InterruptContainerProps {
+  messages: MessageType[];
+  setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
+  interruptVisible: boolean;
+  setInterruptVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  currentInterrupt: InterruptType | null;
+  setCurrentInterrupt: React.Dispatch<React.SetStateAction<InterruptType | null>>;
+  handleCanvasAction: (action: CanvasAction) => void;
+}
+
+const InterruptContainer: React.FC<InterruptContainerProps> = ({
+  messages,
+  setMessages,
+  interruptVisible,
+  setInterruptVisible,
+  currentInterrupt,
+  setCurrentInterrupt,
+  handleCanvasAction,
+}) => {
+  const { toast } = useToast();
+
+  const handleInterruptSubmit = (value: any) => {
+    // Add system message about the user's choice
+    let responseMessage = "";
+    
+    if (currentInterrupt?.type === "choice") {
+      responseMessage = `You selected: ${value}`;
+      
+      // Update canvas state based on selection
+      if (value.toLowerCase().includes("revenue")) {
+        handleCanvasAction({
+          type: 'visualization',
+          payload: { 
+            type: 'bar',
+            description: 'Revenue visualization'
+          },
+          source: 'chat'
+        });
+      } else if (value.toLowerCase().includes("user")) {
+        handleCanvasAction({
+          type: 'visualization',
+          payload: { 
+            type: 'line',
+            description: 'User growth visualization'
+          },
+          source: 'chat'
+        });
+      } else if (value.toLowerCase().includes("performance")) {
+        handleCanvasAction({
+          type: 'visualization',
+          payload: { 
+            type: 'area',
+            description: 'Performance metrics visualization'
+          },
+          source: 'chat'
+        });
+      }
+      
+      // Add a follow-up message after selection
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: uuidv4(),
+            content: `Great! I'll focus my analysis on ${value}. You can see updated visualizations in the canvas now.`,
+            sender: "assistant",
+            timestamp: new Date(),
+          },
+        ]);
+      }, 1000);
+    } else if (currentInterrupt?.type === "confirmation") {
+      responseMessage = "Confirmation received";
+      
+      // If it's a date confirmation, update the canvas state
+      if (currentInterrupt.title.includes("Date")) {
+        // Update the canvas with the confirmed date
+        handleCanvasAction({
+          type: 'date_selection',
+          payload: { 
+            date: new Date(),
+            confirmed: true
+          },
+          source: 'chat'
+        });
+      }
+    }
+    
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: uuidv4(),
+        content: responseMessage,
+        sender: "assistant",
+        timestamp: new Date(),
+      },
+    ]);
+    
+    setInterruptVisible(false);
+    setCurrentInterrupt(null);
+    
+    toast({
+      title: "Input received",
+      description: "The AI will continue processing with your input.",
+    });
+  };
+
+  const handleInterruptCancel = () => {
+    setInterruptVisible(false);
+    setCurrentInterrupt(null);
+    
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: uuidv4(),
+        content: "Interrupt cancelled. Let me know if you need anything else.",
+        sender: "assistant",
+        timestamp: new Date(),
+      },
+    ]);
+  };
+
+  if (!interruptVisible || !currentInterrupt) return null;
+
+  return (
+    <div className="p-4 border-t bg-slate-50">
+      <div className="max-w-md mx-auto">
+        <InterruptHandler
+          interrupt={currentInterrupt}
+          onSubmit={handleInterruptSubmit}
+          onCancel={handleInterruptCancel}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default InterruptContainer;
