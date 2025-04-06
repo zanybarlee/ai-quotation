@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { MessageType } from "@/components/ChatMessage";
 import { useToast } from "@/components/ui/use-toast";
 import { PanelRightOpen, ArrowRightCircle } from "lucide-react";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 const Index = () => {
   const [messages, setMessages] = useState<MessageType[]>([
@@ -216,33 +217,60 @@ const Index = () => {
       </header>
 
       <main className="flex flex-1 overflow-hidden">
-        <div className={`flex flex-col flex-1 transition-all duration-300 ${isCanvasOpen ? "mr-2 pr-2" : ""}`}>
-          <ChatThread messages={messages} />
-          
-          {interruptVisible && currentInterrupt && (
-            <div className="p-4 border-t bg-slate-50">
-              <div className="max-w-md mx-auto">
-                <InterruptHandler
-                  interrupt={currentInterrupt}
-                  onSubmit={handleInterruptSubmit}
-                  onCancel={handleInterruptCancel}
-                />
+        {isCanvasOpen ? (
+          <ResizablePanelGroup 
+            direction="horizontal" 
+            className="w-full"
+          >
+            <ResizablePanel defaultSize={60} minSize={30}>
+              <div className="flex flex-col h-full">
+                <ChatThread messages={messages} />
+                
+                {interruptVisible && currentInterrupt && (
+                  <div className="p-4 border-t bg-slate-50">
+                    <div className="max-w-md mx-auto">
+                      <InterruptHandler
+                        interrupt={currentInterrupt}
+                        onSubmit={handleInterruptSubmit}
+                        onCancel={handleInterruptCancel}
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                <ChatInput onSendMessage={handleSendMessage} isDisabled={isLoading} />
               </div>
-            </div>
-          )}
-          
-          <ChatInput onSendMessage={handleSendMessage} isDisabled={isLoading} />
-        </div>
-
-        {isCanvasOpen && (
-          <div className="w-[40%] border-l">
-            <Canvas 
-              isOpen={isCanvasOpen} 
-              onClose={() => setIsCanvasOpen(false)}
-              title="Interactive Workspace"
-            >
-              <CanvasExample onInterrupt={handleCanvasInterrupt} />
-            </Canvas>
+            </ResizablePanel>
+            
+            <ResizableHandle withHandle />
+            
+            <ResizablePanel defaultSize={40} minSize={20}>
+              <Canvas 
+                isOpen={isCanvasOpen} 
+                onClose={() => setIsCanvasOpen(false)}
+                title="Interactive Workspace"
+              >
+                <CanvasExample onInterrupt={handleCanvasInterrupt} />
+              </Canvas>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        ) : (
+          <div className="flex flex-col flex-1">
+            <ChatThread messages={messages} />
+            
+            {interruptVisible && currentInterrupt && (
+              <div className="p-4 border-t bg-slate-50">
+                <div className="max-w-md mx-auto">
+                  <InterruptHandler
+                    interrupt={currentInterrupt}
+                    onSubmit={handleInterruptSubmit}
+                    onCancel={handleInterruptCancel}
+                  />
+                </div>
+              </div>
+            )}
+            
+            <ChatInput onSendMessage={handleSendMessage} isDisabled={isLoading} />
           </div>
         )}
       </main>
