@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Circle, Edit, Map, MapPin, RefreshCw } from "lucide-react";
 import * as RechartsPrimitive from "recharts";
+import { CanvasAction, CanvasState } from "@/utils/canvasInteraction";
 
 // Mock data for the charts
 const data = [
@@ -24,16 +25,83 @@ const data = [
 interface CanvasExampleProps {
   interruptType?: string;
   onInterrupt?: (type: string, data?: any) => void;
+  onCanvasAction?: (action: CanvasAction) => void;
+  canvasState?: CanvasState;
 }
 
-const CanvasExample: React.FC<CanvasExampleProps> = ({ interruptType, onInterrupt }) => {
-  const [activeTab, setActiveTab] = useState("data");
+const CanvasExample: React.FC<CanvasExampleProps> = ({ 
+  interruptType, 
+  onInterrupt, 
+  onCanvasAction,
+  canvasState
+}) => {
+  const [activeTab, setActiveTab] = useState(canvasState?.activeTab || "data");
   const [sliderValue, setSliderValue] = useState([50]);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(canvasState?.selectedDate || new Date());
+  
+  useEffect(() => {
+    // If canvasState changes from parent, update local state
+    if (canvasState) {
+      if (canvasState.activeTab) setActiveTab(canvasState.activeTab);
+      if (canvasState.selectedDate) setDate(canvasState.selectedDate);
+    }
+  }, [canvasState]);
+  
+  // Handle tab changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    
+    // Notify parent component about tab change
+    if (onCanvasAction) {
+      onCanvasAction({
+        type: 'selection',
+        payload: { 
+          item: value === 'data' ? 'Data Analysis' : 
+                value === 'map' ? 'Location Map' : 'Calendar View', 
+          tabId: value
+        },
+        source: 'canvas'
+      });
+    }
+  };
+  
+  // Handle slider changes
+  const handleSliderChange = (newValue: number[]) => {
+    setSliderValue(newValue);
+    
+    // Notify parent after a short delay to avoid too many updates
+    if (onCanvasAction) {
+      onCanvasAction({
+        type: 'data_update',
+        payload: { 
+          filter: 'threshold', 
+          value: newValue[0],
+          description: `Data threshold set to ${newValue[0]}%`
+        },
+        source: 'canvas'
+      });
+    }
+  };
+  
+  // Handle date selection
+  const handleDateSelect = (newDate: Date | undefined) => {
+    setDate(newDate);
+    
+    if (newDate && onCanvasAction) {
+      onCanvasAction({
+        type: 'date_selection',
+        payload: { 
+          date: newDate,
+          description: `Selected ${newDate.toLocaleDateString()}`
+        },
+        source: 'canvas'
+      });
+    }
+  };
   
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="data" value={activeTab} onValueChange={setActiveTab}>
+      <Tabs defaultValue="data" value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="w-full grid grid-cols-3 mb-4">
           <TabsTrigger value="data">Data Analysis</TabsTrigger>
           <TabsTrigger value="map">Location</TabsTrigger>
@@ -81,7 +149,12 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({ interruptType, onInterrup
                 <Slider 
                   id="threshold"
                   value={sliderValue} 
-                  onValueChange={setSliderValue} 
+                  onValueChange={(value) => {
+                    setSliderValue(value);
+                    // Debounce the notification to avoid too many updates
+                    const timeoutId = setTimeout(() => handleSliderChange(value), 500);
+                    return () => clearTimeout(timeoutId);
+                  }}
                   max={100} 
                   step={1}
                 />
@@ -90,7 +163,21 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({ interruptType, onInterrup
             <CardFooter>
               <Button 
                 className="w-full" 
-                onClick={() => onInterrupt?.("analysis", { type: "visualize" })}
+                onClick={() => {
+                  onInterrupt?.("analysis", { type: "visualize" });
+                  
+                  // Also notify about the action
+                  if (onCanvasAction) {
+                    onCanvasAction({
+                      type: 'visualization',
+                      payload: { 
+                        type: 'update',
+                        description: 'Requested analysis update'
+                      },
+                      source: 'canvas'
+                    });
+                  }
+                }}
               >
                 <RefreshCw className="h-4 w-4 mr-2" /> 
                 Update Analysis
@@ -117,7 +204,22 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({ interruptType, onInterrup
                   <Button 
                     variant="secondary" 
                     size="sm"
-                    onClick={() => onInterrupt?.("location", { action: "select" })}
+                    onClick={() => {
+                      onInterrupt?.("location", { action: "select" });
+                      
+                      // Also notify about the action
+                      if (onCanvasAction) {
+                        onCanvasAction({
+                          type: 'position_change',
+                          payload: { 
+                            name: 'Selected location',
+                            lat: 34.05, 
+                            lng: -118.25
+                          },
+                          source: 'canvas'
+                        });
+                      }
+                    }}
                   >
                     <MapPin className="h-4 w-4 mr-2" /> 
                     Select Location
@@ -138,7 +240,7 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({ interruptType, onInterrup
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={setDate}
+                onSelect={handleDateSelect}
                 className="mx-auto"
               />
             </CardContent>
@@ -147,7 +249,22 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({ interruptType, onInterrup
                 Reset
               </Button>
               <Button 
-                onClick={() => onInterrupt?.("date", { selected: date })}
+                onClick={() => {
+                  onInterrupt?.("date", { selected: date });
+                  
+                  // Also notify about the explicit confirmation
+                  if (onCanvasAction && date) {
+                    onCanvasAction({
+                      type: 'date_selection',
+                      payload: { 
+                        date: date,
+                        confirmed: true,
+                        description: `Confirmed date: ${date.toLocaleDateString()}`
+                      },
+                      source: 'canvas'
+                    });
+                  }
+                }}
               >
                 Confirm Date
               </Button>

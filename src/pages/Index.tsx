@@ -12,6 +12,7 @@ import { MessageType } from "@/components/ChatMessage";
 import { useToast } from "@/components/ui/use-toast";
 import { PanelRightOpen, ArrowRightCircle } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { CanvasAction, CanvasState, canvasActionToMessage, messageToCanvasAction } from "@/utils/canvasInteraction";
 
 const Index = () => {
   const [messages, setMessages] = useState<MessageType[]>([
@@ -26,11 +27,70 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentInterrupt, setCurrentInterrupt] = useState<InterruptType | null>(null);
   const [interruptVisible, setInterruptVisible] = useState(false);
+  const [canvasState, setCanvasState] = useState<CanvasState>({
+    activeTab: "data",
+  });
   const { toast } = useToast();
+
+  // Handle canvas actions
+  const handleCanvasAction = (action: CanvasAction) => {
+    // Update canvas state based on the action
+    if (action.type === 'visualization') {
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: 'data',
+        visualizationType: action.payload.type
+      }));
+    } else if (action.type === 'position_change') {
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: 'map',
+        selectedLocation: action.payload
+      }));
+    } else if (action.type === 'date_selection') {
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: 'calendar',
+        selectedDate: action.payload.date
+      }));
+    } else if (action.type === 'data_update') {
+      setCanvasState(prev => ({
+        ...prev,
+        dataFilters: {
+          ...(prev.dataFilters || {}),
+          [action.payload.filter]: action.payload.value
+        }
+      }));
+    }
+
+    // Add a message to the chat if the action came from the canvas
+    if (action.source === 'canvas') {
+      const messageContent = canvasActionToMessage(action);
+      
+      setMessages(prev => [
+        ...prev,
+        {
+          id: uuidv4(),
+          content: messageContent,
+          sender: "assistant",
+          timestamp: new Date(),
+        },
+      ]);
+      
+      // Show a toast notification
+      toast({
+        title: "Canvas update",
+        description: messageContent,
+      });
+    }
+  };
 
   // Simulate AI response with loading
   const simulateResponse = (userMessage: string) => {
     setIsLoading(true);
+    
+    // Convert the message to a canvas action if applicable
+    const canvasAction = messageToCanvasAction(userMessage);
     
     // Determine if we should trigger an interrupt based on keywords
     const shouldInterrupt = 
@@ -42,6 +102,12 @@ const Index = () => {
       userMessage.toLowerCase().includes("calendar") ||
       userMessage.toLowerCase().includes("schedule");
     
+    // If we got a canvas action, open the canvas and update its state
+    if (canvasAction) {
+      setIsCanvasOpen(true);
+      handleCanvasAction(canvasAction);
+    }
+    
     // Choose response based on message content
     let responseContent = "";
     if (userMessage.toLowerCase().includes("hello") || userMessage.toLowerCase().includes("hi")) {
@@ -49,6 +115,11 @@ const Index = () => {
     } else if (userMessage.toLowerCase().includes("data") || userMessage.toLowerCase().includes("analysis") || userMessage.toLowerCase().includes("chart")) {
       responseContent = "I can help with your data analysis. Let me show you some visualizations in the canvas. What specific metrics are you interested in?";
       setIsCanvasOpen(true);
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: "data"
+      }));
+      
       setTimeout(() => {
         triggerInterrupt({
           type: "choice",
@@ -60,9 +131,17 @@ const Index = () => {
     } else if (userMessage.toLowerCase().includes("map") || userMessage.toLowerCase().includes("location")) {
       responseContent = "I can help you with location planning. I've opened the map view in the canvas. You can select specific locations for more information.";
       setIsCanvasOpen(true);
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: "map"
+      }));
     } else if (userMessage.toLowerCase().includes("calendar") || userMessage.toLowerCase().includes("schedule") || userMessage.toLowerCase().includes("date")) {
       responseContent = "Let's work on your schedule. I've opened the calendar view where you can select dates for your activities.";
       setIsCanvasOpen(true);
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: "calendar"
+      }));
     } else if (!shouldInterrupt) {
       responseContent = "I'm here to help you analyze data, plan locations, or manage schedules. Would you like to explore any of these options? You can open the canvas to see interactive tools.";
     }
@@ -93,6 +172,12 @@ const Index = () => {
     
     setMessages((prev) => [...prev, newMessage]);
     
+    // Process the message to update canvas if needed
+    const canvasAction = messageToCanvasAction(message);
+    if (canvasAction) {
+      handleCanvasAction(canvasAction);
+    }
+    
     // Simulate AI response
     simulateResponse(message);
   };
@@ -109,6 +194,36 @@ const Index = () => {
     if (currentInterrupt?.type === "choice") {
       responseMessage = `You selected: ${value}`;
       
+      // Update canvas state based on selection
+      if (value.toLowerCase().includes("revenue")) {
+        handleCanvasAction({
+          type: 'visualization',
+          payload: { 
+            type: 'bar',
+            description: 'Revenue visualization'
+          },
+          source: 'chat'
+        });
+      } else if (value.toLowerCase().includes("user")) {
+        handleCanvasAction({
+          type: 'visualization',
+          payload: { 
+            type: 'line',
+            description: 'User growth visualization'
+          },
+          source: 'chat'
+        });
+      } else if (value.toLowerCase().includes("performance")) {
+        handleCanvasAction({
+          type: 'visualization',
+          payload: { 
+            type: 'area',
+            description: 'Performance metrics visualization'
+          },
+          source: 'chat'
+        });
+      }
+      
       // Add a follow-up message after selection
       setTimeout(() => {
         setMessages((prev) => [
@@ -123,6 +238,19 @@ const Index = () => {
       }, 1000);
     } else if (currentInterrupt?.type === "confirmation") {
       responseMessage = "Confirmation received";
+      
+      // If it's a date confirmation, update the canvas state
+      if (currentInterrupt.title.includes("Date")) {
+        // Update the canvas with the confirmed date
+        handleCanvasAction({
+          type: 'date_selection',
+          payload: { 
+            date: new Date(),
+            confirmed: true
+          },
+          source: 'chat'
+        });
+      }
     }
     
     setMessages((prev) => [
@@ -250,7 +378,11 @@ const Index = () => {
                 onClose={() => setIsCanvasOpen(false)}
                 title="Interactive Workspace"
               >
-                <CanvasExample onInterrupt={handleCanvasInterrupt} />
+                <CanvasExample 
+                  onInterrupt={handleCanvasInterrupt} 
+                  onCanvasAction={handleCanvasAction}
+                  canvasState={canvasState}
+                />
               </Canvas>
             </ResizablePanel>
           </ResizablePanelGroup>
