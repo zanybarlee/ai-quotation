@@ -28,7 +28,22 @@ const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
         <Calendar
           mode="single"
           selected={date}
-          onSelect={onDateSelect}
+          onSelect={(newDate) => {
+            onDateSelect(newDate);
+            
+            // Notify about the selection but make it silent for chat
+            if (onCanvasAction && newDate) {
+              onCanvasAction({
+                type: 'date_selection',
+                payload: { 
+                  date: newDate,
+                  silent: true, // Add this flag to indicate it shouldn't appear in chat
+                  description: `Selected ${newDate.toLocaleDateString()}`
+                },
+                source: 'canvas'
+              });
+            }
+          }}
           className="mx-auto"
         />
       </CardContent>

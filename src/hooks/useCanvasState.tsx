@@ -50,8 +50,9 @@ export function useCanvasState(
       }));
     }
 
-    // Only add truly significant actions to the chat
+    // Only add truly significant actions to the chat and ignore silent ones
     if (action.source === 'canvas' && 
+        !action.payload.silent && 
         (action.type === 'visualization' || 
          (action.type === 'date_selection' && action.payload.confirmed))) {
       
