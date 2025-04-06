@@ -55,13 +55,13 @@ const Index = () => {
 
       <main className="flex flex-1 overflow-hidden">
         {isCanvasOpen ? <ResizablePanelGroup direction="horizontal" className="w-full">
-            <ResizablePanel defaultSize={60} minSize={30}>
+            <ResizablePanel defaultSize={33} minSize={30}>
               <ChatContainer messages={messages} setMessages={setMessages} isLoading={isLoading} handleSendMessage={handleSendMessage} interruptVisible={interruptVisible} setInterruptVisible={setInterruptVisible} currentInterrupt={currentInterrupt} setCurrentInterrupt={setCurrentInterrupt} handleCanvasAction={handleCanvasAction} />
             </ResizablePanel>
             
             <ResizableHandle withHandle />
             
-            <ResizablePanel defaultSize={40} minSize={20}>
+            <ResizablePanel defaultSize={67} minSize={20}>
               <Canvas isOpen={isCanvasOpen} onClose={() => setIsCanvasOpen(false)} title="Kim Yew Facility Management Quotation Tool">
                 <CanvasExample onInterrupt={handleCanvasInterrupt} onCanvasAction={handleCanvasAction} canvasState={canvasState} />
               </Canvas>
