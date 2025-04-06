@@ -12,9 +12,10 @@ import { canvasActionToMessage, messageToCanvasAction } from "@/utils/canvasInte
 import { useCanvasState } from "@/hooks/useCanvasState";
 import { useInterrupts } from "@/hooks/useInterrupts";
 import { useAIInteractions } from "@/hooks/useAIInteractions";
+import { MessageType } from "@/components/ChatMessage";
 
 const Index = () => {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<MessageType[]>([
     {
       id: "welcome",
       content: "Welcome to Canvas-UX! I'm your AI assistant. How can I help you today?",
@@ -27,6 +28,7 @@ const Index = () => {
   // Initialize hooks
   const { 
     canvasState, 
+    setCanvasState,
     handleCanvasAction 
   } = useCanvasState(setMessages, canvasActionToMessage);
   
@@ -46,7 +48,7 @@ const Index = () => {
     setMessages,
     setIsCanvasOpen,
     handleCanvasAction,
-    (value) => setCanvasState(value),
+    setCanvasState,
     triggerInterrupt,
     messageToCanvasAction
   );

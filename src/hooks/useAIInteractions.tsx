@@ -2,14 +2,14 @@
 import { useState, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MessageType } from "@/components/ChatMessage";
-import { CanvasAction } from "@/utils/canvasInteraction";
+import { CanvasAction, CanvasState } from "@/utils/canvasInteraction";
 import { InterruptType } from "@/components/InterruptHandler";
 
 export function useAIInteractions(
   setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>,
   setIsCanvasOpen: React.Dispatch<React.SetStateAction<boolean>>,
   handleCanvasAction: (action: CanvasAction) => void,
-  setCanvasState: React.Dispatch<React.SetStateAction<any>>,
+  setCanvasState: React.Dispatch<React.SetStateAction<CanvasState>>,
   triggerInterrupt: (interrupt: InterruptType) => void,
   messageToCanvasAction: (message: string) => CanvasAction | null
 ) {
