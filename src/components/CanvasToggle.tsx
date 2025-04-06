@@ -22,12 +22,12 @@ const CanvasToggle: React.FC<CanvasToggleProps> = ({ isOpen, onClick, className 
       {isOpen ? (
         <>
           <Layout className="h-4 w-4" />
-          <span>Hide Quotation</span>
+          <span>Hide Facility Quotation</span>
         </>
       ) : (
         <>
           <LayoutGrid className="h-4 w-4" />
-          <span>Show Quotation</span>
+          <span>Show Facility Quotation</span>
         </>
       )}
     </Button>

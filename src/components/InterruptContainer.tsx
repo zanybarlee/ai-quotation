@@ -50,7 +50,7 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
             ...prev,
             {
               id: uuidv4(),
-              content: `I'll prepare a ${value} quotation based on our schedule of rates. This will include all the standard items for this type of project, as well as any custom requirements you've mentioned.`,
+              content: `I'll prepare a ${value} service quotation based on our facility management rates. This will include all the standard items for this type of service, as well as any custom requirements you've mentioned.`,
               sender: "assistant",
               timestamp: new Date(),
             },

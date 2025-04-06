@@ -42,7 +42,7 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({
     <div className="space-y-6">
       <Tabs defaultValue="quotation" value="quotation">
         <TabsList className="w-full mb-4">
-          <TabsTrigger value="quotation" className="w-full">Quotation</TabsTrigger>
+          <TabsTrigger value="quotation" className="w-full">Facility Management Quotation</TabsTrigger>
         </TabsList>
         
         <TabsContent value="quotation" className="space-y-4">

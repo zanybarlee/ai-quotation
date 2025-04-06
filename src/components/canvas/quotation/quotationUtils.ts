@@ -13,15 +13,18 @@ export interface QuotationResultType {
 }
 
 export const baseHourRates: Record<string, number> = {
-  "Web Development": 85,
-  "API Integration": 95,
-  "Database Design": 90,
-  "UI/UX Design": 80,
-  "Testing": 70,
-  "Deployment": 75,
-  "Maintenance": 65,
-  "Training": 60,
-  "Documentation": 55
+  "Maintenance & Inspection": 85,
+  "Fire Safety Checks": 95,
+  "Façade Inspections": 110,
+  "Renovation & Repairs": 90,
+  "General Building Repairs": 80,
+  "Cleaning Services": 60,
+  "Deep Cleaning": 75,
+  "Pest Control": 70,
+  "Energy Audits": 105,
+  "Green Initiatives": 90,
+  "Security Services": 65,
+  "Equipment Maintenance": 85
 };
 
 export const generateQuotation = (requirements: string, selectedItems: string[]): QuotationResultType => {
@@ -47,7 +50,7 @@ export const generateQuotation = (requirements: string, selectedItems: string[])
   const totalCost = lineItems.reduce((sum, item) => sum + item.cost, 0);
 
   // Create a title based on the requirements
-  let title = "Project Quotation";
+  let title = "Facility Management Quotation";
   if (requirements.length > 10) {
     // Extract a reasonable title from the first sentence of requirements
     const firstSentence = requirements.split('.')[0].trim();

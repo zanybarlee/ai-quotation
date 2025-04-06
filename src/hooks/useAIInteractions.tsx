@@ -32,8 +32,8 @@ export function useAIInteractions(
       userMessage.toLowerCase().includes("calendar") ||
       userMessage.toLowerCase().includes("schedule") ||
       userMessage.toLowerCase().includes("quotation") ||
-      userMessage.toLowerCase().includes("quote") ||
-      userMessage.toLowerCase().includes("proposal");
+      userMessage.toLowerCase().includes("facility") ||
+      userMessage.toLowerCase().includes("maintenance");
     
     // If we got a canvas action, open the canvas and update its state
     if (canvasAction) {
@@ -42,7 +42,7 @@ export function useAIInteractions(
       
       // If it's a quotation action, let's handle it specifically
       if (canvasAction.type === 'quotation_generation') {
-        // Extract Schedule of Rate items from the message
+        // Extract facility services from the message
         const sorItems = extractSORItems(userMessage);
         
         // Update the canvas state with the quotation data
@@ -52,16 +52,16 @@ export function useAIInteractions(
           quotationData: {
             requirements: canvasAction.payload.requirements,
             sorItems: sorItems,
-            previousQuotes: ["Basic Website", "Enterprise Portal", "E-commerce Solution"]
+            previousQuotes: ["Annual Maintenance Contract", "Office Building Cleaning", "Energy Efficiency Audit"]
           }
         }));
         
         setTimeout(() => {
           triggerInterrupt({
             type: "choice",
-            title: "Quotation Generation",
-            description: "What type of quotation would you like to generate?",
-            options: ["Web Development", "Software Integration", "Maintenance & Support", "Custom Solution"]
+            title: "Facility Management Quotation",
+            description: "What type of facility service would you like to prioritize?",
+            options: ["Maintenance & Inspection", "Renovation & Repairs", "Cleaning & Pest Control", "Energy & Sustainability"]
           });
         }, 1500);
       }
@@ -70,9 +70,9 @@ export function useAIInteractions(
     // Choose response based on message content
     let responseContent = "";
     if (userMessage.toLowerCase().includes("hello") || userMessage.toLowerCase().includes("hi")) {
-      responseContent = "Hello! I'm ready to assist you with data analysis, location planning, scheduling, or creating quotations. What would you like to explore today?";
+      responseContent = "Hello! I'm ready to assist you with facility management quotes, including maintenance schedules, building repairs, cleaning services, or energy management. How can I help your facility today?";
     } else if (userMessage.toLowerCase().includes("data") || userMessage.toLowerCase().includes("analysis") || userMessage.toLowerCase().includes("chart")) {
-      responseContent = "I can help with your data analysis. Let me show you some visualizations in the canvas. What specific metrics are you interested in?";
+      responseContent = "I can help analyze your facility's data. Let me show you some visualizations in the canvas. What specific metrics are you interested in?";
       setIsCanvasOpen(true);
       setCanvasState(prev => ({
         ...prev,
@@ -83,19 +83,19 @@ export function useAIInteractions(
         triggerInterrupt({
           type: "choice",
           title: "Select Analysis Focus",
-          description: "What aspect of the data would you like to focus on?",
-          options: ["Revenue trends", "User growth", "Performance metrics", "Conversion rates"]
+          description: "What aspect of facility data would you like to focus on?",
+          options: ["Maintenance costs", "Energy consumption", "Space utilization", "Service response times"]
         });
       }, 2000);
     } else if (userMessage.toLowerCase().includes("map") || userMessage.toLowerCase().includes("location")) {
-      responseContent = "I can help you with location planning. I've opened the map view in the canvas. You can select specific locations for more information.";
+      responseContent = "I can help you with facility locations. I've opened the map view in the canvas. You can select specific buildings or areas for more information.";
       setIsCanvasOpen(true);
       setCanvasState(prev => ({
         ...prev,
         activeTab: "map"
       }));
     } else if (userMessage.toLowerCase().includes("calendar") || userMessage.toLowerCase().includes("schedule") || userMessage.toLowerCase().includes("date")) {
-      responseContent = "Let's work on your schedule. I've opened the calendar view where you can select dates for your activities.";
+      responseContent = "Let's work on your maintenance schedule. I've opened the calendar view where you can select dates for inspections, repairs, or regular maintenance.";
       setIsCanvasOpen(true);
       setCanvasState(prev => ({
         ...prev,
@@ -104,15 +104,17 @@ export function useAIInteractions(
     } else if (userMessage.toLowerCase().includes("quotation") || 
                userMessage.toLowerCase().includes("quote") || 
                userMessage.toLowerCase().includes("proposal") || 
-               userMessage.toLowerCase().includes("sor")) {
-      responseContent = "I can help you generate a quotation based on your requirements and our schedule of rates. I've opened the quotation module in the canvas.";
+               userMessage.toLowerCase().includes("maintenance") ||
+               userMessage.toLowerCase().includes("facility") ||
+               userMessage.toLowerCase().includes("cleaning")) {
+      responseContent = "I can help you generate a quotation based on your facility management requirements. I've opened the quotation module in the canvas.";
       setIsCanvasOpen(true);
       setCanvasState(prev => ({
         ...prev,
         activeTab: "quotation"
       }));
     } else if (!shouldInterrupt) {
-      responseContent = "I'm here to help you analyze data, plan locations, manage schedules, or create quotations. Would you like to explore any of these options? You can open the canvas to see interactive tools.";
+      responseContent = "I'm here to help with your facility management needs including maintenance schedules, repairs, cleaning services, and energy management. What would you like a quotation for today?";
     }
 
     // Simulate a delay before adding the response

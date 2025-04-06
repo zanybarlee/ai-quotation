@@ -14,7 +14,7 @@ export function useCanvasState(
     quotationData: {
       requirements: "",
       sorItems: [],
-      previousQuotes: ["Basic Website", "Enterprise Portal", "E-commerce Solution"],
+      previousQuotes: ["Annual Maintenance Contract", "Office Building Cleaning", "Energy Efficiency Audit"],
     }
   });
   const { toast } = useToast();
@@ -29,7 +29,7 @@ export function useCanvasState(
         quotationData: {
           requirements: action.payload.requirements,
           sorItems: action.payload.sorItems || prev.quotationData?.sorItems || [],
-          previousQuotes: prev.quotationData?.previousQuotes || ["Basic Website", "Enterprise Portal", "E-commerce Solution"],
+          previousQuotes: prev.quotationData?.previousQuotes || ["Annual Maintenance Contract", "Office Building Cleaning", "Energy Efficiency Audit"],
           // Add any new quotation data from the payload
           ...(action.payload.quoteType ? { quoteType: action.payload.quoteType } : {})
         }
@@ -47,7 +47,7 @@ export function useCanvasState(
       
       // For quotation_generation, add some additional helpful text
       let enhancedMessage = messageContent;
-      enhancedMessage += "\n\nI've opened the quotation module in the canvas. You can now customize the requirements and select items from our Schedule of Rates.";
+      enhancedMessage += "\n\nI've opened the facility management quotation module in the canvas. You can now customize the requirements and select services for your facility.";
       
       setMessages(prev => [
         ...prev,
@@ -62,7 +62,7 @@ export function useCanvasState(
     
     // Always show a toast notification for visual feedback
     toast({
-      title: "Quotation updated",
+      title: "Facility quotation updated",
       description: canvasActionToMessage(action),
     });
   }, [setMessages, canvasActionToMessage, toast]);

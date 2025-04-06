@@ -34,7 +34,7 @@ export const canvasActionToMessage = (action: CanvasAction): string => {
     case 'date_selection':
       return `Selected date: ${action.payload.date?.toLocaleDateString() || 'New date'}`;
     case 'quotation_generation':
-      return `Preparing quotation based on your requirements: ${action.payload.summary || 'Quotation generation'}`;
+      return `Preparing facility management quotation based on your requirements: ${action.payload.summary || 'Quotation generation'}`;
     default:
       return 'Canvas updated';
   }
@@ -92,8 +92,10 @@ export const messageToCanvasAction = (message: string): CanvasAction | null => {
   if (lowerMessage.includes('quotation') || 
       lowerMessage.includes('quote') || 
       lowerMessage.includes('proposal') || 
-      lowerMessage.includes('rfp') ||
-      (lowerMessage.includes('sor') && lowerMessage.includes('rate'))) {
+      lowerMessage.includes('maintenance') ||
+      lowerMessage.includes('facility') ||
+      lowerMessage.includes('cleaning') ||
+      lowerMessage.includes('repair')) {
     
     // Extract potential requirements from the message
     const requirements = message;
@@ -102,8 +104,8 @@ export const messageToCanvasAction = (message: string): CanvasAction | null => {
       type: 'quotation_generation',
       payload: { 
         requirements,
-        summary: 'Quotation automation based on your requirements',
-        needsSOR: lowerMessage.includes('sor') || lowerMessage.includes('schedule of rate')
+        summary: 'Facility management quotation based on your requirements',
+        needsSOR: lowerMessage.includes('service') || lowerMessage.includes('facility management')
       },
       source: 'chat'
     };
@@ -115,18 +117,20 @@ export const messageToCanvasAction = (message: string): CanvasAction | null => {
 // Function to extract SOR items from a message
 export const extractSORItems = (message: string): string[] => {
   // This is a simplified example - in a real app, you would have more sophisticated extraction
-  const sorTerms = [
-    "web development",
-    "api integration",
-    "database design",
-    "ui/ux design",
-    "testing",
-    "deployment",
-    "maintenance",
-    "training",
-    "documentation"
+  const facilityTerms = [
+    "maintenance & inspection",
+    "fire safety checks",
+    "façade inspections",
+    "renovation & repairs",
+    "general building repairs",
+    "cleaning services",
+    "deep cleaning",
+    "pest control",
+    "energy audits",
+    "green initiatives",
+    "security services",
+    "equipment maintenance"
   ];
   
-  return sorTerms.filter(term => message.toLowerCase().includes(term.toLowerCase()));
+  return facilityTerms.filter(term => message.toLowerCase().includes(term.toLowerCase()));
 };
-

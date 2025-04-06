@@ -18,9 +18,15 @@ interface ChatMessageProps {
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.sender === "user";
 
-  // Highlight quotation-related terms in the message
-  const highlightQuotationTerms = (text: string) => {
-    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate", "pricing"];
+  // Highlight facility management terms in the message
+  const highlightFacilityTerms = (text: string) => {
+    const terms = [
+      "quotation", "quote", "proposal", 
+      "maintenance", "inspection", "repairs", 
+      "cleaning", "pest control", "energy", 
+      "facility", "building", "sustainability"
+    ];
+    
     let highlightedText = text;
     
     terms.forEach(term => {
@@ -33,10 +39,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     return <p className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: highlightedText }} />;
   };
 
-  // Check if message is quotation-related
-  const isQuotationRelated = () => {
+  // Check if message is facility management related
+  const isFacilityRelated = () => {
     const lowerContent = message.content.toLowerCase();
-    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate", "pricing"];
+    const terms = [
+      "quotation", "quote", "proposal", 
+      "maintenance", "inspection", "repairs", 
+      "cleaning", "pest control", "energy", 
+      "facility", "building", "sustainability"
+    ];
     return terms.some(term => lowerContent.includes(term));
   };
 
@@ -58,17 +69,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         {isUser ? (
           <div className="flex items-start gap-2">
             <p className="whitespace-pre-wrap">{message.content}</p>
-            {isQuotationRelated() && (
+            {isFacilityRelated() && (
               <Quote className="h-4 w-4 text-white mt-1 flex-shrink-0" />
             )}
           </div>
         ) : (
           <div>
-            {highlightQuotationTerms(message.content)}
-            {isQuotationRelated() && (
+            {highlightFacilityTerms(message.content)}
+            {isFacilityRelated() && (
               <div className="mt-2 text-xs text-kimyew-blue italic flex items-center gap-1">
                 <Quote className="h-3 w-3" />
-                <span>Quotation features available</span>
+                <span>Facility management services available</span>
               </div>
             )}
           </div>

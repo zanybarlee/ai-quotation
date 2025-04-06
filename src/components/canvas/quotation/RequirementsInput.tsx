@@ -17,14 +17,14 @@ const RequirementsInput: React.FC<RequirementsInputProps> = ({
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2 mb-2">
-        <h3 className="text-lg font-medium">Requirements</h3>
+        <h3 className="text-lg font-medium">Facility Requirements</h3>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <HelpCircle className="h-4 w-4 text-kimyew-blue cursor-help" />
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-sm">Describe your project requirements in detail</p>
+              <p className="text-sm">Describe your building or facility requirements in detail</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -32,7 +32,7 @@ const RequirementsInput: React.FC<RequirementsInputProps> = ({
       <Textarea 
         value={userRequirements} 
         onChange={(e) => setUserRequirements(e.target.value)}
-        placeholder="Describe your project requirements here..."
+        placeholder="Describe your building or facility requirements here (e.g., building size, scope of work, compliance needs)..."
         className="min-h-[120px] mb-4 border-kimyew-blue/20 focus-visible:ring-kimyew-blue/50"
       />
     </div>

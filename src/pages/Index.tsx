@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Canvas from "@/components/Canvas";
@@ -12,10 +13,11 @@ import { useCanvasState } from "@/hooks/useCanvasState";
 import { useInterrupts } from "@/hooks/useInterrupts";
 import { useAIInteractions } from "@/hooks/useAIInteractions";
 import { MessageType } from "@/components/ChatMessage";
+
 const Index = () => {
   const [messages, setMessages] = useState<MessageType[]>([{
     id: "welcome",
-    content: "Welcome to Kim Yew Integrated! I'm your AI assistant. How can I help you today?",
+    content: "Welcome to Kim Yew Integrated! I'm your AI assistant for facility management quotations. How can I help you today?",
     sender: "assistant",
     timestamp: new Date()
   }]);
@@ -39,6 +41,7 @@ const Index = () => {
     isLoading,
     handleSendMessage
   } = useAIInteractions(setMessages, setIsCanvasOpen, handleCanvasAction, setCanvasState, triggerInterrupt, messageToCanvasAction);
+  
   return <div className="flex flex-col h-screen bg-gray-50">
       <header className="border-b bg-white p-4 shadow-sm">
         <div className="container mx-auto flex items-center justify-between">
@@ -59,7 +62,7 @@ const Index = () => {
             <ResizableHandle withHandle />
             
             <ResizablePanel defaultSize={40} minSize={20}>
-              <Canvas isOpen={isCanvasOpen} onClose={() => setIsCanvasOpen(false)} title="Kim Yew Quotation Tool">
+              <Canvas isOpen={isCanvasOpen} onClose={() => setIsCanvasOpen(false)} title="Kim Yew Facility Management Quotation Tool">
                 <CanvasExample onInterrupt={handleCanvasInterrupt} onCanvasAction={handleCanvasAction} canvasState={canvasState} />
               </Canvas>
             </ResizablePanel>
@@ -75,4 +78,5 @@ const Index = () => {
         </div>}
     </div>;
 };
+
 export default Index;

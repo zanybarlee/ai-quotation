@@ -13,23 +13,26 @@ const SORSelector: React.FC<SORSelectorProps> = ({
   selectedItems,
   toggleSORItem
 }) => {
-  const defaultSORItems = [
-    "Web Development",
-    "API Integration",
-    "Database Design",
-    "UI/UX Design",
-    "Testing",
-    "Deployment",
-    "Maintenance",
-    "Training",
-    "Documentation"
+  const facilityManagementItems = [
+    "Maintenance & Inspection",
+    "Fire Safety Checks",
+    "Façade Inspections",
+    "Renovation & Repairs",
+    "General Building Repairs",
+    "Cleaning Services",
+    "Deep Cleaning",
+    "Pest Control",
+    "Energy Audits",
+    "Green Initiatives",
+    "Security Services",
+    "Equipment Maintenance"
   ];
 
   return (
     <div>
-      <Label className="text-sm font-medium mb-2 block">Schedule of Rates Items</Label>
+      <Label className="text-sm font-medium mb-2 block">Facility Management Services</Label>
       <div className="flex flex-wrap gap-2 mt-2">
-        {defaultSORItems.map((item) => (
+        {facilityManagementItems.map((item) => (
           <Badge 
             key={item}
             variant={selectedItems.includes(item) ? "default" : "outline"}
