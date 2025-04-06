@@ -5,6 +5,7 @@ import { CanvasAction, CanvasState } from "@/utils/canvasInteraction";
 import DataVisualization from "@/components/canvas/DataVisualization";
 import LocationMap from "@/components/canvas/LocationMap";
 import ScheduleCalendar from "@/components/canvas/ScheduleCalendar";
+import QuotationTab from "@/components/canvas/QuotationTab";
 
 interface CanvasExampleProps {
   interruptType?: string;
@@ -47,7 +48,8 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({
         type: 'selection',
         payload: { 
           item: value === 'data' ? 'Data Analysis' : 
-                value === 'map' ? 'Location Map' : 'Calendar View', 
+                value === 'map' ? 'Location Map' : 
+                value === 'calendar' ? 'Calendar View' : 'Quotation',
           tabId: value
         },
         source: 'canvas'
@@ -125,10 +127,11 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({
   return (
     <div className="space-y-6">
       <Tabs defaultValue="data" value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="w-full grid grid-cols-3 mb-4">
+        <TabsList className="w-full grid grid-cols-4 mb-4">
           <TabsTrigger value="data">Data Analysis</TabsTrigger>
           <TabsTrigger value="map">Location</TabsTrigger>
           <TabsTrigger value="calendar">Schedule</TabsTrigger>
+          <TabsTrigger value="quotation">Quotation</TabsTrigger>
         </TabsList>
         
         <TabsContent value="data" className="space-y-4">
@@ -156,6 +159,15 @@ const CanvasExample: React.FC<CanvasExampleProps> = ({
             date={date}
             onDateSelect={handleDateSelect}
             onInterrupt={onInterrupt}
+            onCanvasAction={onCanvasAction}
+          />
+        </TabsContent>
+
+        <TabsContent value="quotation" className="space-y-4">
+          <QuotationTab 
+            requirements={canvasState?.quotationData?.requirements}
+            sorItems={canvasState?.quotationData?.sorItems}
+            previousQuotes={canvasState?.quotationData?.previousQuotes}
             onCanvasAction={onCanvasAction}
           />
         </TabsContent>

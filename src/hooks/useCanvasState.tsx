@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { CanvasAction, CanvasState } from "@/utils/canvasInteraction";
 import { useToast } from "@/components/ui/use-toast";
@@ -53,7 +54,10 @@ export function useCanvasState(
         activeTab: 'quotation',
         quotationData: {
           requirements: action.payload.requirements,
-          // Other quotation data will be populated elsewhere
+          sorItems: action.payload.sorItems || prev.quotationData?.sorItems || [],
+          previousQuotes: prev.quotationData?.previousQuotes || ["Basic Website", "Enterprise Portal", "E-commerce Solution"],
+          // Add any new quotation data from the payload
+          ...(action.payload.quoteType ? { quoteType: action.payload.quoteType } : {})
         }
       }));
     }
@@ -67,15 +71,21 @@ export function useCanvasState(
     const excludedTypes = ['visualization', 'date_selection', 'position_change'];
     const shouldExclude = excludedTypes.includes(action.type);
     
-    // Only add to chat if from chat interaction, not silent, and not excluded
+    // Add to chat if specific conditions are met
     if (isFromChatInteraction && !isSilent && !shouldExclude) {
       const messageContent = canvasActionToMessage(action);
+      
+      // For quotation_generation, add some additional helpful text
+      let enhancedMessage = messageContent;
+      if (action.type === 'quotation_generation') {
+        enhancedMessage += "\n\nI've opened the quotation module in the canvas. You can now customize the requirements and select items from our Schedule of Rates.";
+      }
       
       setMessages(prev => [
         ...prev,
         {
           id: uuidv4(),
-          content: messageContent,
+          content: enhancedMessage,
           sender: "assistant",
           timestamp: new Date(),
         },

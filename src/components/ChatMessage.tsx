@@ -2,7 +2,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
-import { Bot, User } from "lucide-react";
+import { Bot, User, FileText } from "lucide-react";
 
 export type MessageType = {
   id: string;
@@ -26,11 +26,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     terms.forEach(term => {
       const regex = new RegExp(`\\b(${term})\\b`, 'gi');
       highlightedText = highlightedText.replace(regex, match => 
-        `<span class="font-semibold text-purple-700 dark:text-purple-400">${match}</span>`
+        `<span class="font-semibold text-purple-700 dark:text-purple-400 underline">${match}</span>`
       );
     });
     
     return <p className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: highlightedText }} />;
+  };
+
+  // Check if message is quotation-related
+  const isQuotationRelated = () => {
+    const lowerContent = message.content.toLowerCase();
+    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate"];
+    return terms.some(term => lowerContent.includes(term));
   };
 
   return (
@@ -49,9 +56,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         )}
       >
         {isUser ? (
-          <p className="whitespace-pre-wrap">{message.content}</p>
+          <div className="flex items-start gap-2">
+            <p className="whitespace-pre-wrap">{message.content}</p>
+            {isQuotationRelated() && (
+              <FileText className="h-4 w-4 text-white mt-1 flex-shrink-0" />
+            )}
+          </div>
         ) : (
-          highlightQuotationTerms(message.content)
+          <div>
+            {highlightQuotationTerms(message.content)}
+            {isQuotationRelated() && (
+              <div className="mt-2 text-xs text-purple-600 italic flex items-center gap-1">
+                <FileText className="h-3 w-3" />
+                <span>Quotation features available</span>
+              </div>
+            )}
+          </div>
         )}
         <div className={cn("text-xs mt-1", isUser ? "text-purple-200" : "text-gray-500")}>
           {new Date(message.timestamp).toLocaleTimeString([], {
@@ -70,4 +90,3 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 };
 
 export default ChatMessage;
-
