@@ -20,7 +20,7 @@ const PreviousQuotes: React.FC<PreviousQuotesProps> = ({ previousQuotes }) => {
         {previousQuotes.map((quote, index) => (
           <div key={index} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-md">
             <div className="flex items-center">
-              <FileText className="h-4 w-4 mr-2 text-purple-500" />
+              <FileText className="h-4 w-4 mr-2 text-kimyew-blue" />
               <span>{quote}</span>
             </div>
             <Button variant="ghost" size="sm">View</Button>

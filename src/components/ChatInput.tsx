@@ -41,7 +41,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isDisabled = false
         type="submit"
         size="icon"
         disabled={!message.trim() || isDisabled}
-        className="rounded-full h-10 w-10 bg-purple-500 hover:bg-purple-600"
+        className="rounded-full h-10 w-10 bg-kimyew-red hover:bg-kimyew-red/90"
       >
         <SendIcon className="h-5 w-5" />
       </Button>
