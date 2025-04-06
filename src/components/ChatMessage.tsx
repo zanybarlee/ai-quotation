@@ -2,7 +2,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
-import { Bot, User, FileText, Quote } from "lucide-react";
+import { Bot, User, Quote } from "lucide-react";
 
 export type MessageType = {
   id: string;
@@ -26,7 +26,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     terms.forEach(term => {
       const regex = new RegExp(`\\b(${term})\\b`, 'gi');
       highlightedText = highlightedText.replace(regex, match => 
-        `<span class="font-semibold text-purple-700 dark:text-purple-400 underline">${match}</span>`
+        `<span class="font-semibold text-kimyew-blue dark:text-kimyew-blue underline">${match}</span>`
       );
     });
     
@@ -43,15 +43,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   return (
     <div className={cn("flex w-full gap-3 p-4", isUser ? "justify-end" : "justify-start")}>
       {!isUser && (
-        <Avatar className="h-8 w-8 bg-purple-100 flex items-center justify-center">
-          <Bot className="h-4 w-4 text-purple-600" />
+        <Avatar className="h-8 w-8 bg-kimyew-blue/10 flex items-center justify-center">
+          <Bot className="h-4 w-4 text-kimyew-blue" />
         </Avatar>
       )}
       <div
         className={cn(
           "rounded-lg px-4 py-2 max-w-[80%]",
           isUser
-            ? "bg-purple-500 text-white rounded-tr-none"
+            ? "bg-kimyew-red text-white rounded-tr-none"
             : "bg-gray-100 text-gray-800 rounded-tl-none"
         )}
       >
@@ -66,14 +66,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           <div>
             {highlightQuotationTerms(message.content)}
             {isQuotationRelated() && (
-              <div className="mt-2 text-xs text-purple-600 italic flex items-center gap-1">
+              <div className="mt-2 text-xs text-kimyew-blue italic flex items-center gap-1">
                 <Quote className="h-3 w-3" />
                 <span>Quotation features available</span>
               </div>
             )}
           </div>
         )}
-        <div className={cn("text-xs mt-1", isUser ? "text-purple-200" : "text-gray-500")}>
+        <div className={cn("text-xs mt-1", isUser ? "text-white/70" : "text-gray-500")}>
           {new Date(message.timestamp).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -81,7 +81,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         </div>
       </div>
       {isUser && (
-        <Avatar className="h-8 w-8 bg-purple-500 flex items-center justify-center">
+        <Avatar className="h-8 w-8 bg-kimyew-red flex items-center justify-center">
           <User className="h-4 w-4 text-white" />
         </Avatar>
       )}

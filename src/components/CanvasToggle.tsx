@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Layout, LayoutGrid, X } from "lucide-react";
+import { Layout, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CanvasToggleProps {
@@ -16,18 +16,18 @@ const CanvasToggle: React.FC<CanvasToggleProps> = ({ isOpen, onClick, className 
       variant="outline"
       size="sm"
       onClick={onClick}
-      className={cn("gap-2", className)}
+      className={cn("gap-2 border-kimyew-blue text-kimyew-blue hover:bg-kimyew-blue hover:text-white", className)}
       aria-label={isOpen ? "Hide canvas" : "Show canvas"}
     >
       {isOpen ? (
         <>
           <Layout className="h-4 w-4" />
-          <span>Hide Canvas</span>
+          <span>Hide Quotation</span>
         </>
       ) : (
         <>
           <LayoutGrid className="h-4 w-4" />
-          <span>Show Canvas</span>
+          <span>Show Quotation</span>
         </>
       )}
     </Button>
