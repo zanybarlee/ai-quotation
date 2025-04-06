@@ -31,54 +31,81 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
     // Remove the redundant system message about the user's choice
     
     if (currentInterrupt?.type === "choice") {
-      // Update canvas state based on selection without adding a chat message
-      if (value.toLowerCase().includes("revenue")) {
+      // Check if this is a quotation-related interrupt
+      if (currentInterrupt.title.includes("Quotation")) {
+        // Handle quotation-specific choices
         handleCanvasAction({
-          type: 'visualization',
+          type: 'quotation_generation',
           payload: { 
-            type: 'bar',
-            description: 'Revenue visualization',
-            dataType: 'revenue',
+            quoteType: value,
+            summary: `Generating ${value} quotation`,
             silent: true
           },
           source: 'chat'
         });
-      } else if (value.toLowerCase().includes("user")) {
-        handleCanvasAction({
-          type: 'visualization',
-          payload: { 
-            type: 'line',
-            description: 'User growth visualization',
-            dataType: 'users',
-            silent: true
-          },
-          source: 'chat'
-        });
-      } else if (value.toLowerCase().includes("performance")) {
-        handleCanvasAction({
-          type: 'visualization',
-          payload: { 
-            type: 'area',
-            description: 'Performance metrics visualization',
-            dataType: 'conversion',
-            silent: true
-          },
-          source: 'chat'
-        });
+        
+        // Add a follow-up message after selection
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: uuidv4(),
+              content: `I'll prepare a ${value} quotation based on our schedule of rates. This will include all the standard items for this type of project, as well as any custom requirements you've mentioned.`,
+              sender: "assistant",
+              timestamp: new Date(),
+            },
+          ]);
+        }, 1000);
+      } else {
+        // Update canvas state based on selection without adding a chat message
+        if (value.toLowerCase().includes("revenue")) {
+          handleCanvasAction({
+            type: 'visualization',
+            payload: { 
+              type: 'bar',
+              description: 'Revenue visualization',
+              dataType: 'revenue',
+              silent: true
+            },
+            source: 'chat'
+          });
+        } else if (value.toLowerCase().includes("user")) {
+          handleCanvasAction({
+            type: 'visualization',
+            payload: { 
+              type: 'line',
+              description: 'User growth visualization',
+              dataType: 'users',
+              silent: true
+            },
+            source: 'chat'
+          });
+        } else if (value.toLowerCase().includes("performance")) {
+          handleCanvasAction({
+            type: 'visualization',
+            payload: { 
+              type: 'area',
+              description: 'Performance metrics visualization',
+              dataType: 'conversion',
+              silent: true
+            },
+            source: 'chat'
+          });
+        }
+        
+        // Add a follow-up message after selection
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: uuidv4(),
+              content: `Great! I'll focus my analysis on ${value}. You can see updated visualizations in the canvas now.`,
+              sender: "assistant",
+              timestamp: new Date(),
+            },
+          ]);
+        }, 1000);
       }
-      
-      // Add a follow-up message after selection
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: uuidv4(),
-            content: `Great! I'll focus my analysis on ${value}. You can see updated visualizations in the canvas now.`,
-            sender: "assistant",
-            timestamp: new Date(),
-          },
-        ]);
-      }, 1000);
     } else if (currentInterrupt?.type === "confirmation") {
       // If it's a location or date confirmation, update the canvas state without adding a chat message
       if (currentInterrupt.title.includes("Location")) {

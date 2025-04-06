@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { CanvasAction, CanvasState } from "@/utils/canvasInteraction";
 import { useToast } from "@/components/ui/use-toast";
@@ -47,6 +46,15 @@ export function useCanvasState(
         },
         // Update dataType if the action includes it
         ...(action.payload.dataType ? { dataType: action.payload.dataType } : {})
+      }));
+    } else if (action.type === 'quotation_generation') {
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: 'quotation',
+        quotationData: {
+          requirements: action.payload.requirements,
+          // Other quotation data will be populated elsewhere
+        }
       }));
     }
 

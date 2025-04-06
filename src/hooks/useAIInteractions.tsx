@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MessageType } from "@/components/ChatMessage";
-import { CanvasAction, CanvasState } from "@/utils/canvasInteraction";
+import { CanvasAction, CanvasState, extractSORItems } from "@/utils/canvasInteraction";
 import { InterruptType } from "@/components/InterruptHandler";
 
 export function useAIInteractions(
@@ -30,18 +30,47 @@ export function useAIInteractions(
       userMessage.toLowerCase().includes("map") ||
       userMessage.toLowerCase().includes("location") ||
       userMessage.toLowerCase().includes("calendar") ||
-      userMessage.toLowerCase().includes("schedule");
+      userMessage.toLowerCase().includes("schedule") ||
+      userMessage.toLowerCase().includes("quotation") ||
+      userMessage.toLowerCase().includes("quote") ||
+      userMessage.toLowerCase().includes("proposal");
     
     // If we got a canvas action, open the canvas and update its state
     if (canvasAction) {
       setIsCanvasOpen(true);
       handleCanvasAction(canvasAction);
+      
+      // If it's a quotation action, let's handle it specifically
+      if (canvasAction.type === 'quotation_generation') {
+        // Extract Schedule of Rate items from the message
+        const sorItems = extractSORItems(userMessage);
+        
+        // Update the canvas state with the quotation data
+        setCanvasState(prev => ({
+          ...prev,
+          activeTab: "quotation",
+          quotationData: {
+            requirements: canvasAction.payload.requirements,
+            sorItems: sorItems,
+            previousQuotes: ["Basic Website", "Enterprise Portal", "E-commerce Solution"]
+          }
+        }));
+        
+        setTimeout(() => {
+          triggerInterrupt({
+            type: "choice",
+            title: "Quotation Generation",
+            description: "What type of quotation would you like to generate?",
+            options: ["Web Development", "Software Integration", "Maintenance & Support", "Custom Solution"]
+          });
+        }, 1500);
+      }
     }
     
     // Choose response based on message content
     let responseContent = "";
     if (userMessage.toLowerCase().includes("hello") || userMessage.toLowerCase().includes("hi")) {
-      responseContent = "Hello! I'm ready to assist you with data analysis, location planning, or scheduling. What would you like to explore today?";
+      responseContent = "Hello! I'm ready to assist you with data analysis, location planning, scheduling, or creating quotations. What would you like to explore today?";
     } else if (userMessage.toLowerCase().includes("data") || userMessage.toLowerCase().includes("analysis") || userMessage.toLowerCase().includes("chart")) {
       responseContent = "I can help with your data analysis. Let me show you some visualizations in the canvas. What specific metrics are you interested in?";
       setIsCanvasOpen(true);
@@ -72,8 +101,18 @@ export function useAIInteractions(
         ...prev,
         activeTab: "calendar"
       }));
+    } else if (userMessage.toLowerCase().includes("quotation") || 
+               userMessage.toLowerCase().includes("quote") || 
+               userMessage.toLowerCase().includes("proposal") || 
+               userMessage.toLowerCase().includes("sor")) {
+      responseContent = "I can help you generate a quotation based on your requirements and our schedule of rates. I've opened the quotation module in the canvas.";
+      setIsCanvasOpen(true);
+      setCanvasState(prev => ({
+        ...prev,
+        activeTab: "quotation"
+      }));
     } else if (!shouldInterrupt) {
-      responseContent = "I'm here to help you analyze data, plan locations, or manage schedules. Would you like to explore any of these options? You can open the canvas to see interactive tools.";
+      responseContent = "I'm here to help you analyze data, plan locations, manage schedules, or create quotations. Would you like to explore any of these options? You can open the canvas to see interactive tools.";
     }
 
     // Simulate a delay before adding the response

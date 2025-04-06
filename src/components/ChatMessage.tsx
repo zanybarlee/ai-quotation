@@ -18,6 +18,21 @@ interface ChatMessageProps {
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.sender === "user";
 
+  // Highlight quotation-related terms in the message
+  const highlightQuotationTerms = (text: string) => {
+    const terms = ["quotation", "quote", "proposal", "rfp", "sor", "schedule of rate"];
+    let highlightedText = text;
+    
+    terms.forEach(term => {
+      const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+      highlightedText = highlightedText.replace(regex, match => 
+        `<span class="font-semibold text-purple-700 dark:text-purple-400">${match}</span>`
+      );
+    });
+    
+    return <p className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: highlightedText }} />;
+  };
+
   return (
     <div className={cn("flex w-full gap-3 p-4", isUser ? "justify-end" : "justify-start")}>
       {!isUser && (
@@ -33,7 +48,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             : "bg-gray-100 text-gray-800 rounded-tl-none"
         )}
       >
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        {isUser ? (
+          <p className="whitespace-pre-wrap">{message.content}</p>
+        ) : (
+          highlightQuotationTerms(message.content)
+        )}
         <div className={cn("text-xs mt-1", isUser ? "text-purple-200" : "text-gray-500")}>
           {new Date(message.timestamp).toLocaleTimeString([], {
             hour: "2-digit",
@@ -51,3 +70,4 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 };
 
 export default ChatMessage;
+

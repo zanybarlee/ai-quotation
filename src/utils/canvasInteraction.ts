@@ -1,7 +1,7 @@
 
 // Types for canvas interactions
 export interface CanvasAction {
-  type: 'data_update' | 'selection' | 'visualization' | 'position_change' | 'date_selection';
+  type: 'data_update' | 'selection' | 'visualization' | 'position_change' | 'date_selection' | 'quotation_generation';
   payload: any;
   source: 'canvas' | 'chat';
 }
@@ -13,6 +13,11 @@ export interface CanvasState {
   selectedDate?: Date;
   dataFilters?: Record<string, any>;
   dataType?: 'sales' | 'users' | 'revenue' | 'conversion';
+  quotationData?: {
+    requirements: string;
+    sorItems?: string[];
+    previousQuotes?: string[];
+  };
 }
 
 // Helper function to convert canvas actions to human-readable messages
@@ -28,6 +33,8 @@ export const canvasActionToMessage = (action: CanvasAction): string => {
       return `Moved to location: ${action.payload.name || 'New location'}`;
     case 'date_selection':
       return `Selected date: ${action.payload.date?.toLocaleDateString() || 'New date'}`;
+    case 'quotation_generation':
+      return `Preparing quotation based on your requirements: ${action.payload.summary || 'Quotation generation'}`;
     default:
       return 'Canvas updated';
   }
@@ -81,5 +88,45 @@ export const messageToCanvasAction = (message: string): CanvasAction | null => {
     };
   }
   
+  // Handle quotation-related requests
+  if (lowerMessage.includes('quotation') || 
+      lowerMessage.includes('quote') || 
+      lowerMessage.includes('proposal') || 
+      lowerMessage.includes('rfp') ||
+      (lowerMessage.includes('sor') && lowerMessage.includes('rate'))) {
+    
+    // Extract potential requirements from the message
+    const requirements = message;
+    
+    return {
+      type: 'quotation_generation',
+      payload: { 
+        requirements,
+        summary: 'Quotation automation based on your requirements',
+        needsSOR: lowerMessage.includes('sor') || lowerMessage.includes('schedule of rate')
+      },
+      source: 'chat'
+    };
+  }
+  
   return null;
 };
+
+// Function to extract SOR items from a message
+export const extractSORItems = (message: string): string[] => {
+  // This is a simplified example - in a real app, you would have more sophisticated extraction
+  const sorTerms = [
+    "web development",
+    "api integration",
+    "database design",
+    "ui/ux design",
+    "testing",
+    "deployment",
+    "maintenance",
+    "training",
+    "documentation"
+  ];
+  
+  return sorTerms.filter(term => message.toLowerCase().includes(term.toLowerCase()));
+};
+
