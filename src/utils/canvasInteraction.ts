@@ -1,7 +1,7 @@
 
 // Types for canvas interactions
 export interface CanvasAction {
-  type: 'data_update' | 'selection' | 'visualization' | 'position_change' | 'date_selection' | 'quotation';
+  type: 'data_update' | 'selection' | 'visualization' | 'position_change' | 'date_selection';
   payload: any;
   source: 'canvas' | 'chat';
 }
@@ -13,7 +13,6 @@ export interface CanvasState {
   selectedDate?: Date;
   dataFilters?: Record<string, any>;
   dataType?: 'sales' | 'users' | 'revenue' | 'conversion';
-  quotationInput?: string;
 }
 
 // Helper function to convert canvas actions to human-readable messages
@@ -29,8 +28,6 @@ export const canvasActionToMessage = (action: CanvasAction): string => {
       return `Moved to location: ${action.payload.name || 'New location'}`;
     case 'date_selection':
       return `Selected date: ${action.payload.date?.toLocaleDateString() || 'New date'}`;
-    case 'quotation':
-      return `Created quotation from: ${action.payload.text?.substring(0, 50)}...`;
     default:
       return 'Canvas updated';
   }
@@ -80,17 +77,6 @@ export const messageToCanvasAction = (message: string): CanvasAction | null => {
     return {
       type: 'date_selection',
       payload: { activate: true },
-      source: 'chat'
-    };
-  }
-  
-  if (lowerMessage.includes('quotation') || lowerMessage.includes('quote') || lowerMessage.includes('proposal') || lowerMessage.includes('rfp')) {
-    return {
-      type: 'quotation',
-      payload: { 
-        text: message,
-        activate: true 
-      },
       source: 'chat'
     };
   }

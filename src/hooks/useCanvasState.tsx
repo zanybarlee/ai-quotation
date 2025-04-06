@@ -4,7 +4,6 @@ import { CanvasAction, CanvasState } from "@/utils/canvasInteraction";
 import { useToast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import { MessageType } from "@/components/ChatMessage";
-import { useNavigate } from "react-router-dom";
 
 export function useCanvasState(
   setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>,
@@ -16,7 +15,6 @@ export function useCanvasState(
     dataType: "revenue",
   });
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   // Handle canvas actions
   const handleCanvasAction = useCallback((action: CanvasAction) => {
@@ -50,25 +48,6 @@ export function useCanvasState(
         // Update dataType if the action includes it
         ...(action.payload.dataType ? { dataType: action.payload.dataType } : {})
       }));
-    } else if (action.type === 'quotation') {
-      // For quotation actions, navigate to the quotation page and store the input
-      const inputText = action.payload.text || '';
-      
-      // First add the message to state (can be accessed in the quotation page)
-      setCanvasState(prev => ({
-        ...prev,
-        quotationInput: inputText
-      }));
-      
-      // Then navigate to the quotation page
-      if (action.payload.activate) {
-        navigate('/quotation', { 
-          state: { 
-            inputText,
-            fromChat: true
-          }
-        });
-      }
     }
 
     // Only add action to the chat if it was explicitly called from the chat
@@ -100,7 +79,7 @@ export function useCanvasState(
       title: "Canvas updated",
       description: canvasActionToMessage(action),
     });
-  }, [setMessages, canvasActionToMessage, toast, navigate]);
+  }, [setMessages, canvasActionToMessage, toast]);
 
   return { canvasState, setCanvasState, handleCanvasAction };
 }

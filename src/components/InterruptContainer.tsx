@@ -103,19 +103,6 @@ const InterruptContainer: React.FC<InterruptContainerProps> = ({
           },
           source: 'chat'
         });
-      } else if (currentInterrupt.title.includes("Generate Quotation")) {
-        // Handle quotation generation confirmation
-        const lastUserMessage = [...messages].reverse().find(m => m.sender === "user");
-        if (lastUserMessage) {
-          handleCanvasAction({
-            type: 'quotation',
-            payload: { 
-              text: lastUserMessage.content,
-              activate: true
-            },
-            source: 'chat'
-          });
-        }
       }
     }
     

@@ -34,35 +34,14 @@ export function useAIInteractions(
     
     // If we got a canvas action, open the canvas and update its state
     if (canvasAction) {
-      if (canvasAction.type !== 'quotation') {
-        setIsCanvasOpen(true);
-      }
+      setIsCanvasOpen(true);
       handleCanvasAction(canvasAction);
-      
-      // For quotation-related actions, we'll handle differently
-      if (canvasAction.type === 'quotation') {
-        // The navigation happens in handleCanvasAction, so we just need
-        // to set a response message and exit early
-        setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: uuidv4(),
-              content: "I'm creating a quotation based on your requirements. Taking you to the quotation editor now.",
-              sender: "assistant",
-              timestamp: new Date(),
-            },
-          ]);
-          setIsLoading(false);
-        }, 1500);
-        return;
-      }
     }
     
     // Choose response based on message content
     let responseContent = "";
     if (userMessage.toLowerCase().includes("hello") || userMessage.toLowerCase().includes("hi")) {
-      responseContent = "Hello! I'm ready to assist you with data analysis, location planning, scheduling, or generating quotations. What would you like to explore today?";
+      responseContent = "Hello! I'm ready to assist you with data analysis, location planning, or scheduling. What would you like to explore today?";
     } else if (userMessage.toLowerCase().includes("data") || userMessage.toLowerCase().includes("analysis") || userMessage.toLowerCase().includes("chart")) {
       responseContent = "I can help with your data analysis. Let me show you some visualizations in the canvas. What specific metrics are you interested in?";
       setIsCanvasOpen(true);
@@ -93,21 +72,8 @@ export function useAIInteractions(
         ...prev,
         activeTab: "calendar"
       }));
-    } else if (userMessage.toLowerCase().includes("quotation") || 
-               userMessage.toLowerCase().includes("quote") ||
-               userMessage.toLowerCase().includes("rfp") || 
-               userMessage.toLowerCase().includes("proposal")) {
-      responseContent = "I can help you create a professional RFP document based on your requirements. Would you like me to generate a quotation?";
-      
-      setTimeout(() => {
-        triggerInterrupt({
-          type: "confirmation",
-          title: "Generate Quotation",
-          description: "Would you like me to generate a quotation based on your requirements?"
-        });
-      }, 2000);
     } else if (!shouldInterrupt) {
-      responseContent = "I'm here to help you analyze data, plan locations, manage schedules, or create quotations. Would you like to explore any of these options?";
+      responseContent = "I'm here to help you analyze data, plan locations, or manage schedules. Would you like to explore any of these options? You can open the canvas to see interactive tools.";
     }
 
     // Simulate a delay before adding the response

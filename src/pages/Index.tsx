@@ -6,17 +6,15 @@ import CanvasToggle from "@/components/CanvasToggle";
 import CanvasExample from "@/components/CanvasExample";
 import ChatContainer from "@/components/ChatContainer";
 import { Button } from "@/components/ui/button";
-import { PanelRightOpen, ArrowRightCircle, FileText } from "lucide-react";
+import { PanelRightOpen, ArrowRightCircle } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { canvasActionToMessage, messageToCanvasAction } from "@/utils/canvasInteraction";
 import { useCanvasState } from "@/hooks/useCanvasState";
 import { useInterrupts } from "@/hooks/useInterrupts";
 import { useAIInteractions } from "@/hooks/useAIInteractions";
 import { MessageType } from "@/components/ChatMessage";
-import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const navigate = useNavigate();
   const [messages, setMessages] = useState<MessageType[]>([
     {
       id: "welcome",
@@ -63,17 +61,7 @@ const Index = () => {
             <PanelRightOpen className="h-6 w-6 text-purple-500" />
             <h1 className="text-xl font-bold text-slate-800">Canvas-UX Demo</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => navigate("/quotation")}
-            >
-              <FileText className="h-4 w-4" />
-              Quotation Module
-            </Button>
-            <CanvasToggle isOpen={isCanvasOpen} onClick={() => setIsCanvasOpen(!isCanvasOpen)} />
-          </div>
+          <CanvasToggle isOpen={isCanvasOpen} onClick={() => setIsCanvasOpen(!isCanvasOpen)} />
         </div>
       </header>
 
