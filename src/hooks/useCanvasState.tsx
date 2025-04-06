@@ -50,10 +50,9 @@ export function useCanvasState(
       }));
     }
 
-    // Only add significant actions to the chat, skip UI state updates
+    // Only add truly significant actions to the chat
     if (action.source === 'canvas' && 
         (action.type === 'visualization' || 
-         (action.type === 'position_change' && action.payload.name) || 
          (action.type === 'date_selection' && action.payload.confirmed))) {
       
       const messageContent = canvasActionToMessage(action);
@@ -69,7 +68,7 @@ export function useCanvasState(
         },
       ]);
       
-      // Show a toast notification instead for less important updates
+      // Show a toast notification for important updates
       toast({
         title: "Canvas update",
         description: messageContent,

@@ -32,14 +32,15 @@ const LocationMap: React.FC<LocationMapProps> = ({ onInterrupt, onCanvasAction }
               onClick={() => {
                 onInterrupt?.("location", { action: "select" });
                 
-                // Also notify about the action
+                // Notify about the action but make it silent for chat
                 if (onCanvasAction) {
                   onCanvasAction({
                     type: 'position_change',
                     payload: { 
                       name: 'Selected location',
                       lat: 34.05, 
-                      lng: -118.25
+                      lng: -118.25,
+                      silent: true // Add this flag to indicate it shouldn't appear in chat
                     },
                     source: 'canvas'
                   });
