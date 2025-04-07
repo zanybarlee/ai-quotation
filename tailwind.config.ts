@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,10 +62,9 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Add Kim Yew brand colors
 				kimyew: {
-					red: '#DC1E35',
-					blue: '#0078BE'
+					blue: '#0078BE',
+					lightblue: '#33C3F0'
 				}
 			},
 			borderRadius: {
@@ -100,4 +98,3 @@ export default {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-

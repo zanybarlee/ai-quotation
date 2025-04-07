@@ -62,7 +62,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         className={cn(
           "rounded-lg px-4 py-2 max-w-[80%]",
           isUser
-            ? "bg-kimyew-red text-white rounded-tr-none"
+            ? "bg-kimyew-blue text-white rounded-tr-none"
             : "bg-gray-100 text-gray-800 rounded-tl-none"
         )}
       >
@@ -92,7 +92,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         </div>
       </div>
       {isUser && (
-        <Avatar className="h-8 w-8 bg-kimyew-red flex items-center justify-center">
+        <Avatar className="h-8 w-8 bg-kimyew-blue flex items-center justify-center">
           <User className="h-4 w-4 text-white" />
         </Avatar>
       )}

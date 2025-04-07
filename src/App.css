@@ -7,7 +7,7 @@ body {
 }
 
 .logo-hover:hover {
-  filter: drop-shadow(0 0 2em rgba(220, 30, 53, 0.6));
+  filter: drop-shadow(0 0 2em rgba(0, 120, 190, 0.6));
   transition: filter 300ms;
 }
 

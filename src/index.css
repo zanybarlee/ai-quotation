@@ -14,12 +14,12 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Update primary to match Kim Yew red */
-    --primary: 350 85% 49%;
+    /* Update primary to match Kim Yew blue */
+    --primary: 201 100% 37%;
     --primary-foreground: 210 40% 98%;
 
-    /* Update secondary to match Kim Yew blue */
-    --secondary: 201 100% 37%;
+    /* Update secondary to light blue */
+    --secondary: 199 95% 57%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
@@ -64,12 +64,12 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    /* Update primary to match Kim Yew red */
-    --primary: 350 85% 49%;
+    /* Update primary to match Kim Yew blue */
+    --primary: 201 100% 37%;
     --primary-foreground: 210 40% 98%;
 
-    /* Update secondary to match Kim Yew blue */
-    --secondary: 201 100% 37%;
+    /* Update secondary to light blue */
+    --secondary: 199 95% 57%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 217.2 32.6% 17.5%;
