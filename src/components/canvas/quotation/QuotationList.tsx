@@ -28,10 +28,10 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
     
     if (userRole === "approver") {
       loadedQuotations = getPendingQuotations();
-    } else if (userRole === "itAdmin" && showArchived) {
+    } else if ((userRole === "itAdmin" || userRole === "seniorManagement") && showArchived) {
       loadedQuotations = getArchivedQuotations();
-    } else if (userRole === "itAdmin" && !showArchived) {
-      loadedQuotations = getAllQuotations(); // IT Admin can see all, including archived
+    } else if (userRole === "itAdmin" || userRole === "seniorManagement") {
+      loadedQuotations = getAllQuotations(); // IT Admin and Senior Management can see all, including archived
     } else {
       loadedQuotations = getNonArchivedQuotations(); // Other roles see only non-archived
     }
@@ -45,7 +45,7 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
         <p className="text-gray-500">
           {userRole === "approver" 
             ? "There are no pending quotations to review."
-            : userRole === "itAdmin" && showArchived
+            : (userRole === "itAdmin" || userRole === "seniorManagement") && showArchived
             ? "There are no archived quotations."
             : "No quotations have been created yet."}
         </p>
@@ -75,7 +75,7 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
       <h3 className="text-lg font-medium mb-3">
         {userRole === "approver" 
           ? "Pending Quotations" 
-          : userRole === "itAdmin" && showArchived
+          : (userRole === "itAdmin" || userRole === "seniorManagement") && showArchived
           ? "Archived Quotations"
           : "Your Quotations"}
       </h3>
@@ -97,7 +97,7 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
               </div>
             </div>
             <Button size="sm" onClick={() => onSelectQuotation(quotation)}>
-              {userRole === "approver" ? "Review" : userRole === "itAdmin" ? "Manage" : "View"}
+              {userRole === "approver" ? "Review" : (userRole === "itAdmin" || userRole === "seniorManagement") ? "Manage" : "View"}
             </Button>
           </div>
         </Card>

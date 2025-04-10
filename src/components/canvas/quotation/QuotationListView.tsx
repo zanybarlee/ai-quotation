@@ -29,6 +29,7 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
   }, []);
   
   const hasQuotations = quotations.length > 0;
+  const canSeeArchived = userRole === "itAdmin" || userRole === "seniorManagement";
 
   return (
     <>
@@ -41,7 +42,7 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
         )}
       </div>
 
-      {userRole === "itAdmin" && (
+      {canSeeArchived && (
         <Tabs defaultValue="active" className="mb-4" onValueChange={(value) => setShowArchived(value === "archived")}>
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="active">
