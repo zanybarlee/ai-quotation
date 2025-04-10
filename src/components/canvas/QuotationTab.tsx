@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CanvasAction } from "@/utils/canvasInteraction";
 import { generateQuotation, QuotationResultType } from "./quotation/quotationUtils";
@@ -33,10 +32,19 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   
   // View management - explicitly typed as QuotationView to ensure type safety
-  const [currentView, setCurrentView] = useState<QuotationView>(userRole === "approver" ? "list" : "create");
+  const [currentView, setCurrentView] = useState<QuotationView>("list"); // Default to list view
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationResultType | null>(null);
   
   const { toast } = useToast();
+
+  // Set initial view based on user role - only once when component mounts
+  useEffect(() => {
+    if (userRole === "requestor") {
+      setCurrentView("list");
+    } else {
+      setCurrentView("list");
+    }
+  }, [userRole]);
 
   const toggleSORItem = (item: string) => {
     if (selectedItems.includes(item)) {
@@ -91,6 +99,9 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
         title: "Quotation Generated",
         description: "Your quotation has been successfully generated.",
       });
+      
+      // Switch to detail view to see the generated quotation
+      setCurrentView("detail");
     }, 1500);
   };
 
@@ -109,6 +120,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
   };
   
   const handleCreateNew = () => {
+    setGeneratedQuotation(null);
     setCurrentView("create");
   };
   
@@ -126,7 +138,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
         />
       )}
 
-      {currentView === "create" && !generatedQuotation && (
+      {currentView === "create" && (
         <QuotationCreationView
           userRequirements={userRequirements}
           setUserRequirements={setUserRequirements}

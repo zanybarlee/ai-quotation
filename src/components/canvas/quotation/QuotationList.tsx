@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { 
   getAllQuotations, 
   getPendingQuotations,
@@ -16,10 +16,17 @@ interface QuotationListProps {
 }
 
 const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotation }) => {
-  // Get the appropriate list of quotations based on user role
-  const quotations = userRole === "approver" 
-    ? getPendingQuotations() 
-    : getAllQuotations();
+  // Use state to store quotations and force update when component loads
+  const [quotations, setQuotations] = useState<QuotationResultType[]>([]);
+  
+  useEffect(() => {
+    // Get the appropriate list of quotations based on user role
+    const loadedQuotations = userRole === "approver" 
+      ? getPendingQuotations() 
+      : getAllQuotations();
+    
+    setQuotations(loadedQuotations);
+  }, [userRole]);
 
   if (quotations.length === 0) {
     return (

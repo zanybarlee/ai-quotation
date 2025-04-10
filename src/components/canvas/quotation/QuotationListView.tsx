@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import QuotationList from "./QuotationList";
@@ -17,7 +17,14 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
   onSelectQuotation, 
   onCreateNew 
 }) => {
-  const quotations = getAllQuotations();
+  // Use state to force refresh when component loads
+  const [quotations, setQuotations] = useState<QuotationResultType[]>([]);
+  
+  useEffect(() => {
+    // Load quotations when component mounts
+    setQuotations(getAllQuotations());
+  }, []);
+  
   const hasQuotations = quotations.length > 0;
 
   return (
