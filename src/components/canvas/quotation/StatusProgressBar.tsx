@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface StatusProgressBarProps {
-  status?: "draft" | "pending" | "approved" | "rejected";
+  status?: "draft" | "pending" | "approved" | "rejected" | "archived";
 }
 
 const StatusProgressBar: React.FC<StatusProgressBarProps> = ({ status }) => {
@@ -15,6 +15,7 @@ const StatusProgressBar: React.FC<StatusProgressBarProps> = ({ status }) => {
       case "pending": return 50;
       case "approved": return 100;
       case "rejected": return 100;
+      case "archived": return 100;
       default: return 0;
     }
   };
@@ -26,6 +27,7 @@ const StatusProgressBar: React.FC<StatusProgressBarProps> = ({ status }) => {
       case "pending": return "bg-amber-500";
       case "approved": return "bg-green-600";
       case "rejected": return "bg-red-600";
+      case "archived": return "bg-purple-600";
       default: "";
     }
     return "";
@@ -42,8 +44,6 @@ const StatusProgressBar: React.FC<StatusProgressBarProps> = ({ status }) => {
       <Progress 
         value={progressValue} 
         className="h-2" 
-        // Apply the color using className and cn utility instead of the non-existent indicatorClassName prop
-        // We're using style attribute for the indicator directly
         style={{ 
           "--progress-background": getProgressColor() 
         } as React.CSSProperties}
