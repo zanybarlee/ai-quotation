@@ -1,9 +1,10 @@
-
 import { useState, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MessageType } from "@/components/ChatMessage";
 import { CanvasAction, CanvasState, extractSORItems } from "@/utils/canvasInteraction";
 import { InterruptType } from "@/components/InterruptHandler";
+import { query } from "@/utils/chatApi";
+import { UserRole } from "@/components/RoleSelector";
 
 export function useAIInteractions(
   setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>,
@@ -11,12 +12,13 @@ export function useAIInteractions(
   handleCanvasAction: (action: CanvasAction) => void,
   setCanvasState: React.Dispatch<React.SetStateAction<CanvasState>>,
   triggerInterrupt: (interrupt: InterruptType) => void,
-  messageToCanvasAction: (message: string) => CanvasAction | null
+  messageToCanvasAction: (message: string) => CanvasAction | null,
+  currentRole: UserRole
 ) {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Simulate AI response with loading
-  const simulateResponse = useCallback((userMessage: string) => {
+  // Get response from API and process it
+  const simulateResponse = useCallback(async (userMessage: string) => {
     setIsLoading(true);
     
     // Convert the message to a canvas action if applicable
@@ -67,58 +69,11 @@ export function useAIInteractions(
       }
     }
     
-    // Choose response based on message content
-    let responseContent = "";
-    if (userMessage.toLowerCase().includes("hello") || userMessage.toLowerCase().includes("hi")) {
-      responseContent = "Hello! I'm ready to assist you with facility management quotes, including maintenance schedules, building repairs, cleaning services, or energy management. How can I help your facility today?";
-    } else if (userMessage.toLowerCase().includes("data") || userMessage.toLowerCase().includes("analysis") || userMessage.toLowerCase().includes("chart")) {
-      responseContent = "I can help analyze your facility's data. Let me show you some visualizations in the canvas. What specific metrics are you interested in?";
-      setIsCanvasOpen(true);
-      setCanvasState(prev => ({
-        ...prev,
-        activeTab: "data"
-      }));
+    try {
+      // Get response from API using the current role as sessionId
+      const responseContent = await query(userMessage, currentRole);
       
-      setTimeout(() => {
-        triggerInterrupt({
-          type: "choice",
-          title: "Select Analysis Focus",
-          description: "What aspect of facility data would you like to focus on?",
-          options: ["Maintenance costs", "Energy consumption", "Space utilization", "Service response times"]
-        });
-      }, 2000);
-    } else if (userMessage.toLowerCase().includes("map") || userMessage.toLowerCase().includes("location")) {
-      responseContent = "I can help you with facility locations. I've opened the map view in the canvas. You can select specific buildings or areas for more information.";
-      setIsCanvasOpen(true);
-      setCanvasState(prev => ({
-        ...prev,
-        activeTab: "map"
-      }));
-    } else if (userMessage.toLowerCase().includes("calendar") || userMessage.toLowerCase().includes("schedule") || userMessage.toLowerCase().includes("date")) {
-      responseContent = "Let's work on your maintenance schedule. I've opened the calendar view where you can select dates for inspections, repairs, or regular maintenance.";
-      setIsCanvasOpen(true);
-      setCanvasState(prev => ({
-        ...prev,
-        activeTab: "calendar"
-      }));
-    } else if (userMessage.toLowerCase().includes("quotation") || 
-               userMessage.toLowerCase().includes("quote") || 
-               userMessage.toLowerCase().includes("proposal") || 
-               userMessage.toLowerCase().includes("maintenance") ||
-               userMessage.toLowerCase().includes("facility") ||
-               userMessage.toLowerCase().includes("cleaning")) {
-      responseContent = "I can help you generate a quotation based on your facility management requirements. I've opened the quotation module in the canvas.";
-      setIsCanvasOpen(true);
-      setCanvasState(prev => ({
-        ...prev,
-        activeTab: "quotation"
-      }));
-    } else if (!shouldInterrupt) {
-      responseContent = "I'm here to help with your facility management needs including maintenance schedules, repairs, cleaning services, and energy management. What would you like a quotation for today?";
-    }
-
-    // Simulate a delay before adding the response
-    setTimeout(() => {
+      // Add the response to the messages
       setMessages((prev) => [
         ...prev,
         {
@@ -128,8 +83,33 @@ export function useAIInteractions(
           timestamp: new Date(),
         },
       ]);
+      
+      // Check if we need to show interrupts based on the response
+      if (shouldInterrupt) {
+        setTimeout(() => {
+          triggerInterrupt({
+            type: "choice",
+            title: "Select Analysis Focus",
+            description: "What aspect of facility data would you like to focus on?",
+            options: ["Maintenance costs", "Energy consumption", "Space utilization", "Service response times"]
+          });
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error getting response:", error);
+      // Add error message
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          content: "Sorry, I encountered an error processing your request. Please try again later.",
+          sender: "assistant",
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   }, [
     setIsLoading, 
     messageToCanvasAction, 
@@ -137,7 +117,8 @@ export function useAIInteractions(
     handleCanvasAction, 
     setCanvasState, 
     triggerInterrupt, 
-    setMessages
+    setMessages, 
+    currentRole
   ]);
 
   const handleSendMessage = useCallback((message: string) => {
@@ -157,7 +138,7 @@ export function useAIInteractions(
       handleCanvasAction(canvasAction);
     }
     
-    // Simulate AI response
+    // Get API response
     simulateResponse(message);
   }, [setMessages, messageToCanvasAction, handleCanvasAction, simulateResponse]);
 

@@ -1,0 +1,51 @@
+
+/**
+ * Utility for interacting with the external chat API
+ */
+
+import { UserRole } from "@/components/RoleSelector";
+
+interface ChatQueryParams {
+  question: string;
+  overrideConfig: {
+    sessionId: string;
+  };
+}
+
+/**
+ * Send a query to the chat API
+ * @param message - The message to send
+ * @param sessionId - The session ID (role or user ID)
+ * @returns The response from the API
+ */
+export async function query(message: string, sessionId: string): Promise<string> {
+  const data: ChatQueryParams = {
+    question: message,
+    overrideConfig: {
+      sessionId,
+    },
+  };
+
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:3001/api/v1/prediction/f7928d20-6b5e-4075-9cee-e20a139a8f82",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    return result.text;
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return "Sorry, I couldn't process your request at the moment. Please try again later.";
+  }
+}

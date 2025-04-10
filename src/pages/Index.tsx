@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Canvas from "@/components/Canvas";
@@ -42,7 +41,15 @@ const Index = () => {
   const {
     isLoading,
     handleSendMessage
-  } = useAIInteractions(setMessages, setIsCanvasOpen, handleCanvasAction, setCanvasState, triggerInterrupt, messageToCanvasAction);
+  } = useAIInteractions(
+    setMessages, 
+    setIsCanvasOpen, 
+    handleCanvasAction, 
+    setCanvasState, 
+    triggerInterrupt, 
+    messageToCanvasAction,
+    userRole
+  );
   
   function getWelcomeMessageForRole(role: UserRole): string {
     switch (role) {
