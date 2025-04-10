@@ -8,6 +8,7 @@ import { generateQuotation, QuotationResultType, saveQuotation } from "./quotati
 import QuotationListView from "./quotation/QuotationListView";
 import QuotationCreationView from "./quotation/QuotationCreationView";
 import QuotationDetailView from "./quotation/QuotationDetailView";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface QuotationTabProps {
   requirements?: string;
@@ -18,7 +19,7 @@ interface QuotationTabProps {
 }
 
 // Define the type explicitly to ensure TypeScript knows it's a union of specific string literals
-type QuotationView = "list" | "create" | "detail";
+type QuotationView = "list" | "create" | "detail" | "welcome";
 
 const QuotationTab: React.FC<QuotationTabProps> = ({
   requirements = "",
@@ -33,18 +34,15 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   
   // View management - explicitly typed as QuotationView to ensure type safety
-  const [currentView, setCurrentView] = useState<QuotationView>("list"); // Default to list view
+  const [currentView, setCurrentView] = useState<QuotationView>("welcome"); // Default to welcome view
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationResultType | null>(null);
   
   const { toast } = useToast();
 
   // Set initial view based on user role - only once when component mounts
   useEffect(() => {
-    if (userRole === "requestor") {
-      setCurrentView("list");
-    } else {
-      setCurrentView("list");
-    }
+    // We'll start with the welcome view for everyone
+    setCurrentView("welcome");
   }, [userRole]);
 
   const toggleSORItem = (item: string) => {
@@ -135,8 +133,54 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
     setCurrentView("list");
   };
 
+  const handleDismissWelcome = () => {
+    setCurrentView("list");
+  };
+
+  // Generate welcome message based on user role
+  const getWelcomeMessage = () => {
+    switch (userRole) {
+      case "requestor":
+        return "Welcome to the Quotation Tool! Here you can create and submit quotations for facility management services. Start by browsing existing quotations or create a new one.";
+      case "approver":
+        return "Welcome to the Quotation Tool! As an Approver, you can review submitted quotations, approve or reject them, and create new quotations if needed.";
+      case "itAdmin":
+        return "Welcome to the Quotation Tool! As an IT Admin, you have access to all quotations including archived ones. You can manage the system and help other users with technical issues.";
+      case "seniorManagement":
+        return "Welcome to the Quotation Tool! As a Senior Management user, you can review all quotations, create new ones, and access performance reports and analytics.";
+      default:
+        return "Welcome to the Kim Yew Facility Management Quotation Tool! Browse existing quotations or create new ones to get started.";
+    }
+  };
+
+  // Generate welcome title based on user role
+  const getWelcomeTitle = () => {
+    const roleDisplay = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+    return `Welcome, ${roleDisplay}!`;
+  };
+
   return (
     <div className="space-y-4">
+      {currentView === "welcome" && (
+        <Card className="border-l-4 border-l-kimyew-blue">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl text-kimyew-blue">{getWelcomeTitle()}</CardTitle>
+            <CardDescription>Kim Yew Integrated Facility Management</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">{getWelcomeMessage()}</p>
+            <div className="flex justify-end">
+              <button 
+                onClick={handleDismissWelcome}
+                className="px-4 py-2 bg-kimyew-blue text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Get Started
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {currentView === "list" && (
         <QuotationListView 
           userRole={userRole} 
