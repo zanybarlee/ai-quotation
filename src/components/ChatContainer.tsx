@@ -17,6 +17,7 @@ interface ChatContainerProps {
   currentInterrupt: InterruptType | null;
   setCurrentInterrupt: React.Dispatch<React.SetStateAction<InterruptType | null>>;
   handleCanvasAction: (action: CanvasAction) => void;
+  userRole?: string; // Add userRole prop
 }
 
 const ChatContainer: React.FC<ChatContainerProps> = ({
@@ -29,10 +30,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   currentInterrupt,
   setCurrentInterrupt,
   handleCanvasAction,
+  userRole,
 }) => {
   return (
     <div className="flex flex-col h-full">
-      <ChatThread messages={messages} />
+      <ChatThread messages={messages} userRole={userRole} />
       
       {interruptVisible && currentInterrupt && (
         <InterruptContainer

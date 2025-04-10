@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Canvas from "@/components/Canvas";
@@ -105,7 +106,18 @@ const Index = () => {
       <main className="flex flex-1 overflow-hidden">
         {isCanvasOpen ? <ResizablePanelGroup direction="horizontal" className="w-full">
             <ResizablePanel defaultSize={33} minSize={30}>
-              <ChatContainer messages={messages} setMessages={setMessages} isLoading={isLoading} handleSendMessage={handleSendMessage} interruptVisible={interruptVisible} setInterruptVisible={setInterruptVisible} currentInterrupt={currentInterrupt} setCurrentInterrupt={setCurrentInterrupt} handleCanvasAction={handleCanvasAction} />
+              <ChatContainer 
+                messages={messages} 
+                setMessages={setMessages} 
+                isLoading={isLoading} 
+                handleSendMessage={handleSendMessage} 
+                interruptVisible={interruptVisible} 
+                setInterruptVisible={setInterruptVisible} 
+                currentInterrupt={currentInterrupt} 
+                setCurrentInterrupt={setCurrentInterrupt} 
+                handleCanvasAction={handleCanvasAction}
+                userRole={userRole} 
+              />
             </ResizablePanel>
             
             <ResizableHandle withHandle />
@@ -116,7 +128,18 @@ const Index = () => {
               </Canvas>
             </ResizablePanel>
           </ResizablePanelGroup> : <div className="flex flex-col flex-1">
-            <ChatContainer messages={messages} setMessages={setMessages} isLoading={isLoading} handleSendMessage={handleSendMessage} interruptVisible={interruptVisible} setInterruptVisible={setInterruptVisible} currentInterrupt={currentInterrupt} setCurrentInterrupt={setCurrentInterrupt} handleCanvasAction={handleCanvasAction} />
+            <ChatContainer 
+              messages={messages} 
+              setMessages={setMessages} 
+              isLoading={isLoading} 
+              handleSendMessage={handleSendMessage} 
+              interruptVisible={interruptVisible} 
+              setInterruptVisible={setInterruptVisible} 
+              currentInterrupt={currentInterrupt} 
+              setCurrentInterrupt={setCurrentInterrupt} 
+              handleCanvasAction={handleCanvasAction}
+              userRole={userRole}
+            />
           </div>}
       </main>
 

@@ -20,6 +20,7 @@ export interface ChatMessageProps {
   message: MessageType;
   isVisible?: boolean;
   onActionTrigger?: (action: string) => void;
+  userRole?: string; // Add userRole prop
 }
 
 // Helper function to format links in text
@@ -114,11 +115,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   isVisible = true,
   onActionTrigger,
+  userRole = "User", // Default to "User" if no role is provided
 }) => {
   const { sender, content, actions } = message;
   const isUser = sender === "user";
   const isSystem = sender === "system"; // Check if message is a system message
   const [copied, setCopied] = useState(false);
+
+  // Format the user display name - capitalize the first letter of the role
+  const userDisplayName = isUser && userRole ? 
+    userRole.charAt(0).toUpperCase() + userRole.slice(1) : 
+    "User";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(content);
@@ -165,7 +172,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       >
         <div className="flex justify-between items-center">
           <span className="text-xs opacity-70">
-            {isUser ? "You" : "AI Assistant"}
+            {isUser ? userDisplayName : "AI Assistant"}
           </span>
           <Button
             variant="ghost"
