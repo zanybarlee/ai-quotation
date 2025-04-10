@@ -28,7 +28,7 @@ export async function query(message: string, sessionId: string): Promise<string>
 
   try {
     const response = await fetch(
-      "http://127.0.0.1:3001/api/v1/prediction/f7928d20-6b5e-4075-9cee-e20a139a8f82",
+      "http://127.0.0.1:3001/api/v1/prediction/465538e6-caba-4a27-b96f-6cc7530d3be7",
       {
         method: "POST",
         headers: {
