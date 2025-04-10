@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CanvasAction } from "@/utils/canvasInteraction";
 import { generateQuotation, QuotationResultType, saveQuotation } from "./quotation/quotationUtils";
+import { MessageSquare, Info } from "lucide-react"; 
 
 // Import view components
 import QuotationListView from "./quotation/QuotationListView";
 import QuotationCreationView from "./quotation/QuotationCreationView";
 import QuotationDetailView from "./quotation/QuotationDetailView";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface QuotationTabProps {
   requirements?: string;
@@ -43,6 +45,27 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
     // Start directly with the list view for everyone
     setCurrentView("list");
   }, [userRole]);
+
+  // Generate welcome message based on user role
+  const getWelcomeMessage = () => {
+    switch (userRole) {
+      case "requestor":
+        return "Create new quotations for facility services and track their approval status.";
+      case "approver":
+        return "Review submitted quotations and manage approvals for facility services.";
+      case "itAdmin":
+        return "Access and manage all quotations including archived ones.";
+      case "seniorManagement":
+        return "View all quotations and access detailed analytics for facility services.";
+      default:
+        return "Browse existing quotations or create new ones to get started.";
+    }
+  };
+
+  // Get icon based on user role
+  const getWelcomeIcon = () => {
+    return <MessageSquare className="h-5 w-5" />;
+  };
 
   const toggleSORItem = (item: string) => {
     if (selectedItems.includes(item)) {
@@ -134,6 +157,19 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
 
   return (
     <div className="space-y-4">
+      <Alert className="bg-white border-l-4 border-kimyew-blue">
+        <Info className="h-4 w-4 text-kimyew-blue" />
+        <AlertTitle className="text-kimyew-blue font-medium">
+          {userRole === "requestor" ? "Welcome to Quotation Management" 
+            : userRole === "approver" ? "Quotation Review Dashboard" 
+            : userRole === "itAdmin" ? "Quotation Administration" 
+            : "Quotation Overview"}
+        </AlertTitle>
+        <AlertDescription className="text-sm text-gray-600">
+          {getWelcomeMessage()}
+        </AlertDescription>
+      </Alert>
+
       {currentView === "list" && (
         <QuotationListView 
           userRole={userRole} 
