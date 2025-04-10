@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CanvasAction } from "@/utils/canvasInteraction";
@@ -34,15 +33,15 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   
   // View management - explicitly typed as QuotationView to ensure type safety
-  const [currentView, setCurrentView] = useState<QuotationView>("welcome"); // Default to welcome view
+  const [currentView, setCurrentView] = useState<QuotationView>("list"); // Default to list view directly
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationResultType | null>(null);
   
   const { toast } = useToast();
 
   // Set initial view based on user role - only once when component mounts
   useEffect(() => {
-    // We'll start with the welcome view for everyone
-    setCurrentView("welcome");
+    // Start directly with the list view for everyone
+    setCurrentView("list");
   }, [userRole]);
 
   const toggleSORItem = (item: string) => {
@@ -133,54 +132,8 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
     setCurrentView("list");
   };
 
-  const handleDismissWelcome = () => {
-    setCurrentView("list");
-  };
-
-  // Generate welcome message based on user role
-  const getWelcomeMessage = () => {
-    switch (userRole) {
-      case "requestor":
-        return "Welcome to the Quotation Tool! Here you can create and submit quotations for facility management services. Start by browsing existing quotations or create a new one.";
-      case "approver":
-        return "Welcome to the Quotation Tool! As an Approver, you can review submitted quotations, approve or reject them, and create new quotations if needed.";
-      case "itAdmin":
-        return "Welcome to the Quotation Tool! As an IT Admin, you have access to all quotations including archived ones. You can manage the system and help other users with technical issues.";
-      case "seniorManagement":
-        return "Welcome to the Quotation Tool! As a Senior Management user, you can review all quotations, create new ones, and access performance reports and analytics.";
-      default:
-        return "Welcome to the Kim Yew Facility Management Quotation Tool! Browse existing quotations or create new ones to get started.";
-    }
-  };
-
-  // Generate welcome title based on user role
-  const getWelcomeTitle = () => {
-    const roleDisplay = userRole.charAt(0).toUpperCase() + userRole.slice(1);
-    return `Welcome, ${roleDisplay}!`;
-  };
-
   return (
     <div className="space-y-4">
-      {currentView === "welcome" && (
-        <Card className="border-l-4 border-l-kimyew-blue">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl text-kimyew-blue">{getWelcomeTitle()}</CardTitle>
-            <CardDescription>Kim Yew Integrated Facility Management</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4">{getWelcomeMessage()}</p>
-            <div className="flex justify-end">
-              <button 
-                onClick={handleDismissWelcome}
-                className="px-4 py-2 bg-kimyew-blue text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Get Started
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {currentView === "list" && (
         <QuotationListView 
           userRole={userRole} 
