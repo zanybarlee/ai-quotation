@@ -3,7 +3,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import QuotationList from "./QuotationList";
-import { QuotationResultType } from "./quotationUtils";
+import { QuotationResultType, getAllQuotations } from "./quotationUtils";
+import { Card } from "@/components/ui/card";
 
 interface QuotationListViewProps {
   userRole: string;
@@ -16,6 +17,9 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
   onSelectQuotation, 
   onCreateNew 
 }) => {
+  const quotations = getAllQuotations();
+  const hasQuotations = quotations.length > 0;
+
   return (
     <>
       <div className="flex justify-between items-center mb-4">
@@ -26,10 +30,24 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
           </Button>
         )}
       </div>
-      <QuotationList 
-        userRole={userRole} 
-        onSelectQuotation={onSelectQuotation} 
-      />
+
+      {!hasQuotations && userRole === "requestor" ? (
+        <Card className="p-6 text-center">
+          <p className="text-muted-foreground mb-4">You haven't created any quotations yet</p>
+          <Button onClick={onCreateNew}>
+            <PlusCircle className="h-4 w-4 mr-2" /> Create Your First Quotation
+          </Button>
+        </Card>
+      ) : !hasQuotations && userRole === "approver" ? (
+        <Card className="p-6 text-center">
+          <p className="text-muted-foreground">There are no quotations waiting for your approval</p>
+        </Card>
+      ) : (
+        <QuotationList 
+          userRole={userRole} 
+          onSelectQuotation={onSelectQuotation} 
+        />
+      )}
     </>
   );
 };

@@ -31,6 +31,31 @@ export const baseHourRates: Record<string, number> = {
   "Equipment Maintenance": 85
 };
 
+const loadQuotationsFromStorage = (): QuotationResultType[] => {
+  const savedData = localStorage.getItem('savedQuotations');
+  if (savedData) {
+    try {
+      const parsed = JSON.parse(savedData);
+      return parsed.map((q: any) => ({
+        ...q,
+        createdAt: q.createdAt ? new Date(q.createdAt) : undefined
+      }));
+    } catch (e) {
+      console.error('Error loading quotations from localStorage:', e);
+      return [];
+    }
+  }
+  return [];
+};
+
+const saveQuotationsToStorage = (quotations: QuotationResultType[]) => {
+  try {
+    localStorage.setItem('savedQuotations', JSON.stringify(quotations));
+  } catch (e) {
+    console.error('Error saving quotations to localStorage:', e);
+  }
+};
+
 export const generateQuotation = (requirements: string, selectedItems: string[], createdBy?: string): QuotationResultType => {
   const lineItems = selectedItems.map(item => {
     const complexity = requirements.length / 100;
@@ -73,7 +98,7 @@ export const generateQuotation = (requirements: string, selectedItems: string[],
   };
 };
 
-let savedQuotations: QuotationResultType[] = [];
+let savedQuotations: QuotationResultType[] = loadQuotationsFromStorage();
 
 export const saveQuotation = (quotation: QuotationResultType): QuotationResultType => {
   if (quotation.id && savedQuotations.some(q => q.id === quotation.id)) {
@@ -83,6 +108,8 @@ export const saveQuotation = (quotation: QuotationResultType): QuotationResultTy
   } else {
     savedQuotations.push({ ...quotation });
   }
+  
+  saveQuotationsToStorage(savedQuotations);
   
   return quotation;
 };
@@ -94,6 +121,9 @@ export const submitForApproval = (quotationId: string): QuotationResultType | un
       ...savedQuotations[index],
       status: "pending"
     };
+    
+    saveQuotationsToStorage(savedQuotations);
+    
     return savedQuotations[index];
   }
   return undefined;
@@ -107,6 +137,9 @@ export const approveQuotation = (quotationId: string, notes?: string): Quotation
       status: "approved",
       approverNotes: notes
     };
+    
+    saveQuotationsToStorage(savedQuotations);
+    
     return savedQuotations[index];
   }
   return undefined;
@@ -120,6 +153,9 @@ export const rejectQuotation = (quotationId: string, notes?: string): QuotationR
       status: "rejected",
       approverNotes: notes
     };
+    
+    saveQuotationsToStorage(savedQuotations);
+    
     return savedQuotations[index];
   }
   return undefined;
@@ -135,4 +171,9 @@ export const getAllQuotations = (): QuotationResultType[] => {
 
 export const getQuotationById = (id: string): QuotationResultType | undefined => {
   return savedQuotations.find(q => q.id === id);
+};
+
+export const clearAllQuotations = (): void => {
+  savedQuotations = [];
+  localStorage.removeItem('savedQuotations');
 };
