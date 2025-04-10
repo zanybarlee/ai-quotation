@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { 
   QuotationResultType, 
   saveQuotation, 
@@ -97,6 +98,28 @@ const QuotationResult: React.FC<QuotationResultProps> = ({
     }
   };
 
+  // Get progress value based on status
+  const getProgressValue = () => {
+    switch (quotation.status) {
+      case "draft": return 25;
+      case "pending": return 50;
+      case "approved": return 100;
+      case "rejected": return 100;
+      default: return 0;
+    }
+  };
+
+  // Get progress color based on status
+  const getProgressColor = () => {
+    switch (quotation.status) {
+      case "draft": return "bg-gray-400";
+      case "pending": return "bg-amber-500";
+      case "approved": return "bg-green-600";
+      case "rejected": return "bg-red-600";
+      default: return "";
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -114,6 +137,21 @@ const QuotationResult: React.FC<QuotationResultProps> = ({
           {quotation.createdAt && ` • ${quotation.createdAt.toLocaleDateString()}`}
         </div>
       )}
+      
+      {/* New status progress indicator */}
+      <div className="mb-6 mt-3">
+        <div className="flex justify-between text-sm mb-1">
+          <span>Status: <span className="font-medium">{quotation.status?.charAt(0).toUpperCase() + quotation.status?.slice(1) || 'New'}</span></span>
+          <span>{getProgressValue()}% Complete</span>
+        </div>
+        <Progress value={getProgressValue()} className="h-2" indicatorClassName={getProgressColor()} />
+        
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>Draft</span>
+          <span>Under Review</span>
+          <span>Complete</span>
+        </div>
+      </div>
       
       <div className="mb-4">
         <Label className="text-sm font-medium">Requirements</Label>
