@@ -5,6 +5,7 @@ import Canvas from "@/components/Canvas";
 import CanvasToggle from "@/components/CanvasToggle";
 import CanvasExample from "@/components/CanvasExample";
 import ChatContainer from "@/components/ChatContainer";
+import RoleSelector, { UserRole } from "@/components/RoleSelector";
 import { Button } from "@/components/ui/button";
 import { ArrowRightCircle } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
@@ -15,9 +16,10 @@ import { useAIInteractions } from "@/hooks/useAIInteractions";
 import { MessageType } from "@/components/ChatMessage";
 
 const Index = () => {
+  const [userRole, setUserRole] = useState<UserRole>("requestor");
   const [messages, setMessages] = useState<MessageType[]>([{
     id: "welcome",
-    content: "Welcome to Kim Yew Integrated! I'm your AI assistant for facility management quotations. How can I help you today?",
+    content: getWelcomeMessageForRole("requestor"),
     sender: "assistant",
     timestamp: new Date()
   }]);
@@ -42,6 +44,43 @@ const Index = () => {
     handleSendMessage
   } = useAIInteractions(setMessages, setIsCanvasOpen, handleCanvasAction, setCanvasState, triggerInterrupt, messageToCanvasAction);
   
+  function getWelcomeMessageForRole(role: UserRole): string {
+    switch (role) {
+      case "requestor":
+        return "Welcome to Kim Yew Integrated! I'm your AI assistant for facility management quotations. How can I help you today?";
+      case "approver":
+        return "Welcome, Approver. You can review and approve facility management requests here. What would you like to do today?";
+      case "itAdmin":
+        return "Hello IT Admin. You can manage IT-related facility requests and configurations. How can I assist you?";
+      case "erpAdmin":
+        return "Welcome, ERP Administrator. You have access to system configurations and data management. What would you like to do?";
+      case "seniorManagement":
+        return "Welcome, Senior Management. You can view reports, approve high-value requests, and access analytics. How can I assist you today?";
+      default:
+        return "Welcome to Kim Yew Integrated! I'm your AI assistant for facility management quotations. How can I help you today?";
+    }
+  }
+
+  const handleRoleChange = (newRole: UserRole) => {
+    setUserRole(newRole);
+    // Add a system message indicating the role change
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {
+        id: uuidv4(),
+        content: `You are now viewing as: ${newRole.charAt(0).toUpperCase() + newRole.slice(1)}`,
+        sender: "system",
+        timestamp: new Date()
+      },
+      {
+        id: uuidv4(),
+        content: getWelcomeMessageForRole(newRole),
+        sender: "assistant",
+        timestamp: new Date()
+      }
+    ]);
+  };
+  
   return <div className="flex flex-col h-screen bg-gray-50">
       <header className="border-b bg-white p-4 shadow-sm">
         <div className="container mx-auto flex items-center justify-between">
@@ -49,7 +88,10 @@ const Index = () => {
             <img src="/lovable-uploads/49e2a6ff-414f-472d-b350-750831078cc0.png" alt="Kim Yew Integrated Logo" className="h-10" />
             <h1 className="text-xl font-bold text-slate-800">GenAI for Facility Management</h1>
           </div>
-          <CanvasToggle isOpen={isCanvasOpen} onClick={() => setIsCanvasOpen(!isCanvasOpen)} />
+          <div className="flex items-center gap-4">
+            <RoleSelector currentRole={userRole} onRoleChange={handleRoleChange} />
+            <CanvasToggle isOpen={isCanvasOpen} onClick={() => setIsCanvasOpen(!isCanvasOpen)} />
+          </div>
         </div>
       </header>
 

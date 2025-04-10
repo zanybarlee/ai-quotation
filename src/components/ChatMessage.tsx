@@ -1,63 +1,69 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { Avatar } from "./ui/avatar";
+import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
-import { Avatar } from "@/components/ui/avatar";
-import { Bot, User, Quote } from "lucide-react";
+import { ArrowRightCircle, Copy, MessageSquare, User, CheckCheck } from "lucide-react";
 
-export type MessageType = {
+export interface MessageType {
   id: string;
   content: string;
-  sender: "user" | "assistant";
+  sender: "user" | "assistant" | "system"; // Added "system" type
   timestamp: Date;
-};
-
-interface ChatMessageProps {
-  message: MessageType;
+  actions?: Array<{
+    label: string;
+    action: () => void;
+  }>;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
-  const isUser = message.sender === "user";
+export interface ChatMessageProps {
+  message: MessageType;
+  isVisible?: boolean;
+  onActionTrigger?: (action: string) => void;
+}
 
-  // Highlight facility management terms in the message
-  const highlightFacilityTerms = (text: string) => {
-    const terms = [
-      "quotation", "quote", "proposal", 
-      "maintenance", "inspection", "repairs", 
-      "cleaning", "pest control", "energy", 
-      "facility", "building", "sustainability"
-    ];
-    
-    let highlightedText = text;
-    
-    terms.forEach(term => {
-      const regex = new RegExp(`\\b(${term})\\b`, 'gi');
-      highlightedText = highlightedText.replace(regex, match => 
-        `<span class="font-semibold text-kimyew-blue dark:text-kimyew-blue underline">${match}</span>`
-      );
-    });
-    
-    return <p className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: highlightedText }} />;
+const ChatMessage: React.FC<ChatMessageProps> = ({
+  message,
+  isVisible = true,
+  onActionTrigger,
+}) => {
+  const { sender, content, actions } = message;
+  const isUser = sender === "user";
+  const isSystem = sender === "system"; // Check if message is a system message
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  // Check if message is facility management related
-  const isFacilityRelated = () => {
-    const lowerContent = message.content.toLowerCase();
-    const terms = [
-      "quotation", "quote", "proposal", 
-      "maintenance", "inspection", "repairs", 
-      "cleaning", "pest control", "energy", 
-      "facility", "building", "sustainability"
-    ];
-    return terms.some(term => lowerContent.includes(term));
-  };
+  if (!isVisible) return null;
+
+  // Special rendering for system messages
+  if (isSystem) {
+    return (
+      <div className="flex justify-center my-2 px-4">
+        <div className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
+          {content}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={cn("flex w-full gap-3 p-4", isUser ? "justify-end" : "justify-start")}>
+    <div
+      className={cn(
+        "p-4 flex gap-2",
+        isUser ? "justify-end" : "justify-start"
+      )}
+    >
       {!isUser && (
-        <Avatar className="h-8 w-8 bg-kimyew-blue/10 flex items-center justify-center">
-          <Bot className="h-4 w-4 text-kimyew-blue" />
+        <Avatar className="h-8 w-8 bg-kimyew-blue flex items-center justify-center">
+          <MessageSquare className="h-4 w-4 text-white" />
         </Avatar>
       )}
+
       <div
         className={cn(
           "rounded-lg px-4 py-2 max-w-[80%]",
@@ -66,31 +72,45 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             : "bg-gray-100 text-gray-800 rounded-tl-none"
         )}
       >
-        {isUser ? (
-          <div className="flex items-start gap-2">
-            <p className="whitespace-pre-wrap">{message.content}</p>
-            {isFacilityRelated() && (
-              <Quote className="h-4 w-4 text-white mt-1 flex-shrink-0" />
+        <div className="flex justify-between items-center">
+          <span className="text-xs opacity-70">
+            {isUser ? "You" : "AI Assistant"}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "h-5 w-5 p-0 opacity-50 hover:opacity-100",
+              isUser ? "text-white" : "text-gray-500"
             )}
-          </div>
-        ) : (
-          <div>
-            {highlightFacilityTerms(message.content)}
-            {isFacilityRelated() && (
-              <div className="mt-2 text-xs text-kimyew-blue italic flex items-center gap-1">
-                <Quote className="h-3 w-3" />
-                <span>Facility management services available</span>
-              </div>
+            onClick={handleCopy}
+          >
+            {copied ? (
+              <CheckCheck className="h-3 w-3" />
+            ) : (
+              <Copy className="h-3 w-3" />
             )}
+          </Button>
+        </div>
+        <div className="mt-1 text-sm whitespace-pre-wrap">{content}</div>
+        {actions && actions.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {actions.map((action) => (
+              <Button
+                key={action.label}
+                variant="outline"
+                size="sm"
+                className="bg-white text-kimyew-blue border-kimyew-blue/30"
+                onClick={action.action}
+              >
+                {action.label}
+                <ArrowRightCircle className="ml-1 h-3 w-3" />
+              </Button>
+            ))}
           </div>
         )}
-        <div className={cn("text-xs mt-1", isUser ? "text-white/70" : "text-gray-500")}>
-          {new Date(message.timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </div>
       </div>
+
       {isUser && (
         <Avatar className="h-8 w-8 bg-kimyew-blue flex items-center justify-center">
           <User className="h-4 w-4 text-white" />
