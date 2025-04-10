@@ -22,6 +22,7 @@ interface QuotationTabProps {
   onCanvasAction?: (action: CanvasAction) => void;
 }
 
+// Define the type explicitly to ensure TypeScript knows it's a union of specific string literals
 type QuotationView = "list" | "create" | "detail";
 
 const QuotationTab: React.FC<QuotationTabProps> = ({
@@ -36,7 +37,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
   const [selectedItems, setSelectedItems] = useState<string[]>(sorItems);
   const [isGenerating, setIsGenerating] = useState(false);
   
-  // View management
+  // View management - explicitly typed as QuotationView to ensure type safety
   const [currentView, setCurrentView] = useState<QuotationView>(userRole === "approver" ? "list" : "create");
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationResultType | null>(null);
   
@@ -160,7 +161,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
           </div>
           
           <div className="flex gap-3">
-            {currentView !== "list" && userRole === "approver" && (
+            {userRole === "approver" && (
               <Button 
                 variant="outline" 
                 onClick={() => setCurrentView("list")}
@@ -172,7 +173,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
             
             <Button 
               onClick={handleGenerateQuotation} 
-              className={currentView !== "list" && userRole === "approver" ? "w-2/3" : "w-full"}
+              className={userRole === "approver" ? "w-2/3" : "w-full"}
               disabled={isGenerating || userRequirements.trim() === ''}
             >
               {isGenerating ? (
