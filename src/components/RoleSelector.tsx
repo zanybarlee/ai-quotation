@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserRoundCog } from "lucide-react";
+import { UserRoundCog, FileText, ClipboardCheck, Shield, Database, BarChart } from "lucide-react";
 
 export type UserRole = "requestor" | "approver" | "itAdmin" | "erpAdmin" | "seniorManagement";
 
@@ -12,12 +12,12 @@ interface RoleSelectorProps {
 }
 
 const RoleSelector: React.FC<RoleSelectorProps> = ({ currentRole, onRoleChange }) => {
-  const roles: { value: UserRole; label: string }[] = [
-    { value: "requestor", label: "Requestor" },
-    { value: "approver", label: "Approver" },
-    { value: "itAdmin", label: "IT Admin" },
-    { value: "erpAdmin", label: "ERP Admin" },
-    { value: "seniorManagement", label: "Senior Management" },
+  const roles: { value: UserRole; label: string; icon: React.ReactNode }[] = [
+    { value: "requestor", label: "Requestor", icon: <FileText className="h-4 w-4" /> },
+    { value: "approver", label: "Approver", icon: <ClipboardCheck className="h-4 w-4" /> },
+    { value: "itAdmin", label: "IT Admin", icon: <Shield className="h-4 w-4" /> },
+    { value: "erpAdmin", label: "ERP Admin", icon: <Database className="h-4 w-4" /> },
+    { value: "seniorManagement", label: "Senior Management", icon: <BarChart className="h-4 w-4" /> },
   ];
 
   return (
@@ -29,8 +29,11 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ currentRole, onRoleChange }
         </SelectTrigger>
         <SelectContent>
           {roles.map((role) => (
-            <SelectItem key={role.value} value={role.value}>
-              {role.label}
+            <SelectItem key={role.value} value={role.value} className="flex items-center">
+              <div className="flex items-center gap-2">
+                {role.icon}
+                {role.label}
+              </div>
             </SelectItem>
           ))}
         </SelectContent>

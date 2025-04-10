@@ -1,39 +1,131 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-
-export interface QuotationResultType {
-  title: string;
-  description: string;
-  estimatedHours: number;
-  totalCost: number;
-  lineItems: {
-    item: string;
-    hours: number;
-    rate: number;
-    cost: number;
-  }[];
-}
+import { 
+  QuotationResultType, 
+  saveQuotation, 
+  submitForApproval,
+  approveQuotation,
+  rejectQuotation
+} from "./quotationUtils";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, XCircle, Clock, FileEdit } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuotationResultProps {
   quotation: QuotationResultType;
   resetQuotation: () => void;
+  userRole: string;
+  onQuotationUpdated?: (quotation: QuotationResultType) => void;
 }
 
-const QuotationResult: React.FC<QuotationResultProps> = ({ quotation, resetQuotation }) => {
+const QuotationResult: React.FC<QuotationResultProps> = ({ 
+  quotation, 
+  resetQuotation, 
+  userRole,
+  onQuotationUpdated 
+}) => {
+  const [approverNotes, setApproverNotes] = useState("");
+  const { toast } = useToast();
+  
+  const isRequestor = userRole === "requestor";
+  const isApprover = userRole === "approver";
+  
+  const handleSaveQuotation = () => {
+    const savedQuote = saveQuotation(quotation);
+    toast({
+      title: "Quotation Saved",
+      description: `Quotation ${savedQuote.id} has been saved successfully.`
+    });
+    if (onQuotationUpdated) onQuotationUpdated(savedQuote);
+  };
+  
+  const handleSubmitForApproval = () => {
+    if (!quotation.id) return;
+    
+    const updatedQuote = submitForApproval(quotation.id);
+    if (updatedQuote) {
+      toast({
+        title: "Quotation Submitted",
+        description: `Quotation ${updatedQuote.id} has been submitted for approval.`
+      });
+      if (onQuotationUpdated) onQuotationUpdated(updatedQuote);
+    }
+  };
+  
+  const handleApproveQuotation = () => {
+    if (!quotation.id) return;
+    
+    const updatedQuote = approveQuotation(quotation.id, approverNotes);
+    if (updatedQuote) {
+      toast({
+        title: "Quotation Approved",
+        description: `Quotation ${updatedQuote.id} has been approved.`
+      });
+      if (onQuotationUpdated) onQuotationUpdated(updatedQuote);
+    }
+  };
+  
+  const handleRejectQuotation = () => {
+    if (!quotation.id) return;
+    
+    const updatedQuote = rejectQuotation(quotation.id, approverNotes);
+    if (updatedQuote) {
+      toast({
+        title: "Quotation Rejected",
+        description: `Quotation ${updatedQuote.id} has been rejected.`
+      });
+      if (onQuotationUpdated) onQuotationUpdated(updatedQuote);
+    }
+  };
+  
+  const getStatusBadge = () => {
+    switch (quotation.status) {
+      case "draft":
+        return <Badge variant="outline" className="ml-2 bg-gray-100"><FileEdit className="h-3 w-3 mr-1" /> Draft</Badge>;
+      case "pending":
+        return <Badge variant="outline" className="ml-2 bg-amber-100 text-amber-800 border-amber-200"><Clock className="h-3 w-3 mr-1" /> Pending Approval</Badge>;
+      case "approved":
+        return <Badge variant="outline" className="ml-2 bg-green-100 text-green-800 border-green-200"><CheckCircle className="h-3 w-3 mr-1" /> Approved</Badge>;
+      case "rejected":
+        return <Badge variant="outline" className="ml-2 bg-red-100 text-red-800 border-red-200"><XCircle className="h-3 w-3 mr-1" /> Rejected</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-medium">{quotation.title}</h3>
+        <div className="flex items-center">
+          <h3 className="text-xl font-medium">{quotation.title}</h3>
+          {getStatusBadge()}
+        </div>
         <Button variant="outline" size="sm" onClick={resetQuotation}>New Quote</Button>
       </div>
+      
+      {quotation.id && (
+        <div className="text-sm text-gray-500 mb-2">
+          Quotation ID: {quotation.id}
+          {quotation.createdBy && ` • Created by: ${quotation.createdBy}`}
+          {quotation.createdAt && ` • ${quotation.createdAt.toLocaleDateString()}`}
+        </div>
+      )}
       
       <div className="mb-4">
         <Label className="text-sm font-medium">Requirements</Label>
         <p className="text-sm text-gray-700 mt-1">{quotation.description}</p>
       </div>
+      
+      {quotation.approverNotes && (
+        <div className="mb-4 p-3 bg-gray-50 border rounded-md">
+          <Label className="text-sm font-medium">Approver Notes</Label>
+          <p className="text-sm text-gray-700 mt-1">{quotation.approverNotes}</p>
+        </div>
+      )}
       
       <Separator className="my-4" />
       
@@ -70,8 +162,70 @@ const QuotationResult: React.FC<QuotationResultProps> = ({ quotation, resetQuota
           </table>
         </div>
         
-        <div className="mt-6">
-          <Button className="w-full">Save Quotation</Button>
+        <div className="mt-6 space-y-4">
+          {isApprover && quotation.status === "pending" && (
+            <div className="space-y-3">
+              <Label htmlFor="approverNotes">Review Notes</Label>
+              <Textarea 
+                id="approverNotes" 
+                value={approverNotes} 
+                onChange={(e) => setApproverNotes(e.target.value)}
+                placeholder="Add your review notes here..."
+                className="min-h-[80px]"
+              />
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleApproveQuotation} 
+                  className="w-1/2 bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" /> Approve
+                </Button>
+                <Button 
+                  onClick={handleRejectQuotation} 
+                  className="w-1/2 bg-red-600 hover:bg-red-700"
+                >
+                  <XCircle className="h-4 w-4 mr-2" /> Reject
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {isRequestor && (
+            <>
+              {quotation.status === "draft" && (
+                <div className="flex gap-3">
+                  <Button onClick={handleSaveQuotation} variant="outline" className="w-1/2">
+                    Save as Draft
+                  </Button>
+                  <Button onClick={handleSubmitForApproval} className="w-1/2">
+                    Submit for Approval
+                  </Button>
+                </div>
+              )}
+              
+              {quotation.status === "pending" && (
+                <Button disabled className="w-full bg-amber-500 hover:bg-amber-500">
+                  <Clock className="h-4 w-4 mr-2" /> Waiting for Approval
+                </Button>
+              )}
+              
+              {quotation.status === "approved" && (
+                <Button className="w-full bg-green-600 hover:bg-green-700">
+                  <CheckCircle className="h-4 w-4 mr-2" /> Proceed with Approved Quote
+                </Button>
+              )}
+              
+              {quotation.status === "rejected" && (
+                <Button onClick={resetQuotation} className="w-full">
+                  Create New Quotation
+                </Button>
+              )}
+            </>
+          )}
+          
+          {!isRequestor && !isApprover && (
+            <Button className="w-full" onClick={handleSaveQuotation}>Save Quotation</Button>
+          )}
         </div>
       </div>
     </div>

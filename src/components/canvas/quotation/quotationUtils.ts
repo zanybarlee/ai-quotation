@@ -1,9 +1,13 @@
-
 export interface QuotationResultType {
+  id?: string;
   title: string;
   description: string;
   estimatedHours: number;
   totalCost: number;
+  status?: "draft" | "pending" | "approved" | "rejected";
+  approverNotes?: string;
+  createdBy?: string;
+  createdAt?: Date;
   lineItems: {
     item: string;
     hours: number;
@@ -27,10 +31,8 @@ export const baseHourRates: Record<string, number> = {
   "Equipment Maintenance": 85
 };
 
-export const generateQuotation = (requirements: string, selectedItems: string[]): QuotationResultType => {
-  // Generate line items based on selected SOR items
+export const generateQuotation = (requirements: string, selectedItems: string[], createdBy?: string): QuotationResultType => {
   const lineItems = selectedItems.map(item => {
-    // Calculate random but reasonable hours based on the complexity implied by requirements
     const complexity = requirements.length / 100;
     const baseHours = Math.max(4, Math.min(40, Math.floor(8 + Math.random() * 16)));
     const hours = Math.ceil(baseHours * (0.8 + complexity * 0.4));
@@ -45,25 +47,92 @@ export const generateQuotation = (requirements: string, selectedItems: string[])
     };
   });
 
-  // Calculate totals
   const totalHours = lineItems.reduce((sum, item) => sum + item.hours, 0);
   const totalCost = lineItems.reduce((sum, item) => sum + item.cost, 0);
 
-  // Create a title based on the requirements
   let title = "Facility Management Quotation";
   if (requirements.length > 10) {
-    // Extract a reasonable title from the first sentence of requirements
     const firstSentence = requirements.split('.')[0].trim();
     if (firstSentence.length > 5 && firstSentence.length < 50) {
       title = firstSentence;
     }
   }
 
+  const id = `QT-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+
   return {
+    id,
     title,
     description: requirements,
     estimatedHours: totalHours,
     totalCost,
+    status: "draft",
+    createdBy,
+    createdAt: new Date(),
     lineItems
   };
+};
+
+let savedQuotations: QuotationResultType[] = [];
+
+export const saveQuotation = (quotation: QuotationResultType): QuotationResultType => {
+  if (quotation.id && savedQuotations.some(q => q.id === quotation.id)) {
+    savedQuotations = savedQuotations.map(q => 
+      q.id === quotation.id ? { ...quotation } : q
+    );
+  } else {
+    savedQuotations.push({ ...quotation });
+  }
+  
+  return quotation;
+};
+
+export const submitForApproval = (quotationId: string): QuotationResultType | undefined => {
+  const index = savedQuotations.findIndex(q => q.id === quotationId);
+  if (index >= 0) {
+    savedQuotations[index] = {
+      ...savedQuotations[index],
+      status: "pending"
+    };
+    return savedQuotations[index];
+  }
+  return undefined;
+};
+
+export const approveQuotation = (quotationId: string, notes?: string): QuotationResultType | undefined => {
+  const index = savedQuotations.findIndex(q => q.id === quotationId);
+  if (index >= 0) {
+    savedQuotations[index] = {
+      ...savedQuotations[index],
+      status: "approved",
+      approverNotes: notes
+    };
+    return savedQuotations[index];
+  }
+  return undefined;
+};
+
+export const rejectQuotation = (quotationId: string, notes?: string): QuotationResultType | undefined => {
+  const index = savedQuotations.findIndex(q => q.id === quotationId);
+  if (index >= 0) {
+    savedQuotations[index] = {
+      ...savedQuotations[index],
+      status: "rejected",
+      approverNotes: notes
+    };
+    return savedQuotations[index];
+  }
+  return undefined;
+};
+
+export const getPendingQuotations = (): QuotationResultType[] => {
+  return savedQuotations.filter(q => q.status === "pending");
+};
+
+export const getAllQuotations = (): QuotationResultType[] => {
+  return [...savedQuotations];
+};
+
+export const getQuotationById = (id: string): QuotationResultType | undefined => {
+  return savedQuotations.find(q => q.id === id);
 };

@@ -55,9 +55,9 @@ const Index = () => {
   function getWelcomeMessageForRole(role: UserRole): string {
     switch (role) {
       case "requestor":
-        return "Welcome to Kim Yew Integrated! I'm your AI assistant for facility management quotations. How can I help you today?";
+        return "Welcome to Kim Yew Integrated! I'm your AI assistant for facility management quotations. As a Requestor, you can create and submit quotations for approval. How can I help you today?";
       case "approver":
-        return "Welcome, Approver. You can review and approve facility management requests here. What would you like to do today?";
+        return "Welcome, Approver. You can review and approve facility management quotation requests here. You can open the canvas to see pending quotations for review.";
       case "itAdmin":
         return "Hello IT Admin. You can manage IT-related facility requests and configurations. How can I assist you?";
       case "erpAdmin":
@@ -124,7 +124,12 @@ const Index = () => {
             
             <ResizablePanel defaultSize={67} minSize={20}>
               <Canvas isOpen={isCanvasOpen} onClose={() => setIsCanvasOpen(false)} title="Kim Yew Facility Management Quotation Tool">
-                <CanvasExample onInterrupt={handleCanvasInterrupt} onCanvasAction={handleCanvasAction} canvasState={canvasState} />
+                <CanvasExample 
+                  onInterrupt={handleCanvasInterrupt} 
+                  onCanvasAction={handleCanvasAction} 
+                  canvasState={canvasState}
+                  userRole={userRole}
+                />
               </Canvas>
             </ResizablePanel>
           </ResizablePanelGroup> : <div className="flex flex-col flex-1">
