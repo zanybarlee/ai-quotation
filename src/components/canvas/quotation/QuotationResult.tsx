@@ -7,7 +7,8 @@ import {
   saveQuotation, 
   submitForApproval,
   approveQuotation,
-  rejectQuotation
+  rejectQuotation,
+  archiveQuotation
 } from "./quotationUtils";
 import { useToast } from "@/hooks/use-toast";
 import QuotationHeader from "./QuotationHeader";
@@ -78,6 +79,19 @@ const QuotationResult: React.FC<QuotationResultProps> = ({
     }
   };
 
+  const handleArchiveQuotation = () => {
+    if (!quotation.id) return;
+    
+    const updatedQuote = archiveQuotation(quotation.id);
+    if (updatedQuote) {
+      toast({
+        title: "Quotation Archived",
+        description: `Quotation ${updatedQuote.id} has been archived.`
+      });
+      if (onQuotationUpdated) onQuotationUpdated(updatedQuote);
+    }
+  };
+
   return (
     <div>
       <QuotationHeader quotation={quotation} resetQuotation={resetQuotation} />
@@ -108,6 +122,7 @@ const QuotationResult: React.FC<QuotationResultProps> = ({
           onSubmitForApproval={handleSubmitForApproval}
           onApprove={handleApproveQuotation}
           onReject={handleRejectQuotation}
+          onArchive={handleArchiveQuotation}
         />
       </div>
     </div>

@@ -4,7 +4,7 @@ export interface QuotationResultType {
   description: string;
   estimatedHours: number;
   totalCost: number;
-  status?: "draft" | "pending" | "approved" | "rejected";
+  status?: "draft" | "pending" | "approved" | "rejected" | "archived";
   approverNotes?: string;
   createdBy?: string;
   createdAt?: Date;
@@ -161,8 +161,31 @@ export const rejectQuotation = (quotationId: string, notes?: string): QuotationR
   return undefined;
 };
 
+export const archiveQuotation = (quotationId: string): QuotationResultType | undefined => {
+  const index = savedQuotations.findIndex(q => q.id === quotationId);
+  if (index >= 0) {
+    savedQuotations[index] = {
+      ...savedQuotations[index],
+      status: "archived"
+    };
+    
+    saveQuotationsToStorage(savedQuotations);
+    
+    return savedQuotations[index];
+  }
+  return undefined;
+};
+
 export const getPendingQuotations = (): QuotationResultType[] => {
   return savedQuotations.filter(q => q.status === "pending");
+};
+
+export const getArchivedQuotations = (): QuotationResultType[] => {
+  return savedQuotations.filter(q => q.status === "archived");
+};
+
+export const getNonArchivedQuotations = (): QuotationResultType[] => {
+  return savedQuotations.filter(q => q.status !== "archived");
 };
 
 export const getAllQuotations = (): QuotationResultType[] => {

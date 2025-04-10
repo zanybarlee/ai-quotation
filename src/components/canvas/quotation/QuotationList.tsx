@@ -3,37 +3,50 @@ import React, { useEffect, useState } from "react";
 import { 
   getAllQuotations, 
   getPendingQuotations,
+  getNonArchivedQuotations,
+  getArchivedQuotations,
   QuotationResultType 
 } from "./quotationUtils";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, CheckCircle, XCircle, FileEdit } from "lucide-react";
+import { Clock, CheckCircle, XCircle, FileEdit, Archive } from "lucide-react";
 
 interface QuotationListProps {
   userRole: string;
   onSelectQuotation: (quotation: QuotationResultType) => void;
+  showArchived?: boolean;
 }
 
-const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotation }) => {
+const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotation, showArchived = false }) => {
   // Use state to store quotations and force update when component loads
   const [quotations, setQuotations] = useState<QuotationResultType[]>([]);
   
   useEffect(() => {
     // Get the appropriate list of quotations based on user role
-    const loadedQuotations = userRole === "approver" 
-      ? getPendingQuotations() 
-      : getAllQuotations();
+    let loadedQuotations: QuotationResultType[] = [];
+    
+    if (userRole === "approver") {
+      loadedQuotations = getPendingQuotations();
+    } else if (userRole === "itAdmin" && showArchived) {
+      loadedQuotations = getArchivedQuotations();
+    } else if (userRole === "itAdmin" && !showArchived) {
+      loadedQuotations = getAllQuotations(); // IT Admin can see all, including archived
+    } else {
+      loadedQuotations = getNonArchivedQuotations(); // Other roles see only non-archived
+    }
     
     setQuotations(loadedQuotations);
-  }, [userRole]);
+  }, [userRole, showArchived]);
 
   if (quotations.length === 0) {
     return (
       <Card className="p-6 text-center">
         <p className="text-gray-500">
           {userRole === "approver" 
-            ? "There are no pending quotations to review." 
+            ? "There are no pending quotations to review."
+            : userRole === "itAdmin" && showArchived
+            ? "There are no archived quotations."
             : "No quotations have been created yet."}
         </p>
       </Card>
@@ -50,6 +63,8 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
         return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200"><CheckCircle className="h-3 w-3 mr-1" /> Approved</Badge>;
       case "rejected":
         return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200"><XCircle className="h-3 w-3 mr-1" /> Rejected</Badge>;
+      case "archived":
+        return <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200"><Archive className="h-3 w-3 mr-1" /> Archived</Badge>;
       default:
         return null;
     }
@@ -58,7 +73,11 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium mb-3">
-        {userRole === "approver" ? "Pending Quotations" : "Your Quotations"}
+        {userRole === "approver" 
+          ? "Pending Quotations" 
+          : userRole === "itAdmin" && showArchived
+          ? "Archived Quotations"
+          : "Your Quotations"}
       </h3>
       
       {quotations.map((quotation) => (
@@ -78,7 +97,7 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
               </div>
             </div>
             <Button size="sm" onClick={() => onSelectQuotation(quotation)}>
-              {userRole === "approver" ? "Review" : "View"}
+              {userRole === "approver" ? "Review" : userRole === "itAdmin" ? "Manage" : "View"}
             </Button>
           </div>
         </Card>

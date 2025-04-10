@@ -1,10 +1,11 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Archive, Inbox } from "lucide-react";
 import QuotationList from "./QuotationList";
 import { QuotationResultType, getAllQuotations } from "./quotationUtils";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface QuotationListViewProps {
   userRole: string;
@@ -19,6 +20,8 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
 }) => {
   // Use state to force refresh when component loads
   const [quotations, setQuotations] = useState<QuotationResultType[]>([]);
+  // Add a state to track whether to show archived quotations (for IT Admin)
+  const [showArchived, setShowArchived] = useState<boolean>(false);
   
   useEffect(() => {
     // Load quotations when component mounts
@@ -38,6 +41,19 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
         )}
       </div>
 
+      {userRole === "itAdmin" && (
+        <Tabs defaultValue="active" className="mb-4" onValueChange={(value) => setShowArchived(value === "archived")}>
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="active">
+              <Inbox className="h-4 w-4 mr-2" /> Active
+            </TabsTrigger>
+            <TabsTrigger value="archived">
+              <Archive className="h-4 w-4 mr-2" /> Archived
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
+
       {!hasQuotations && userRole === "requestor" ? (
         <Card className="p-6 text-center">
           <p className="text-muted-foreground mb-4">You haven't created any quotations yet</p>
@@ -53,6 +69,7 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
         <QuotationList 
           userRole={userRole} 
           onSelectQuotation={onSelectQuotation} 
+          showArchived={showArchived}
         />
       )}
     </>

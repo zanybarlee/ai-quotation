@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, Clock } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Archive } from "lucide-react";
 import { QuotationResultType } from "./quotationUtils";
 
 interface QuotationActionsProps {
@@ -13,6 +13,7 @@ interface QuotationActionsProps {
   onSubmitForApproval: () => void;
   onApprove: (notes: string) => void;
   onReject: (notes: string) => void;
+  onArchive?: () => void;
 }
 
 const QuotationActions: React.FC<QuotationActionsProps> = ({
@@ -22,10 +23,14 @@ const QuotationActions: React.FC<QuotationActionsProps> = ({
   onSubmitForApproval,
   onApprove,
   onReject,
+  onArchive
 }) => {
   const [approverNotes, setApproverNotes] = useState("");
   const isRequestor = userRole === "requestor";
   const isApprover = userRole === "approver";
+  const isITAdmin = userRole === "itAdmin";
+
+  const isArchivable = (quotation.status === "approved" || quotation.status === "rejected") && isITAdmin;
 
   return (
     <div className="mt-6 space-y-4">
@@ -93,7 +98,16 @@ const QuotationActions: React.FC<QuotationActionsProps> = ({
         </>
       )}
       
-      {!isRequestor && !isApprover && (
+      {isArchivable && onArchive && (
+        <Button 
+          onClick={onArchive}
+          className="w-full bg-purple-600 hover:bg-purple-700"
+        >
+          <Archive className="h-4 w-4 mr-2" /> Archive Quotation
+        </Button>
+      )}
+      
+      {!isRequestor && !isApprover && !isITAdmin && (
         <Button className="w-full" onClick={onSave}>Save Quotation</Button>
       )}
     </div>
