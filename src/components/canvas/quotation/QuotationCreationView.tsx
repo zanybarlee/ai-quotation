@@ -32,12 +32,13 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
   onBackToList
 }) => {
   const { toast } = useToast();
+  const showBackButton = true; // Always show back button for all roles now
 
   return (
     <>
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-4">
-          {userRole !== "requestor" && (
+          {showBackButton && (
             <Button 
               variant="outline" 
               size="sm" 
@@ -63,19 +64,17 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
         </div>
         
         <div className="flex gap-3">
-          {userRole === "approver" && (
-            <Button 
-              variant="outline" 
-              onClick={onBackToList}
-              className="w-1/3"
-            >
-              Cancel
-            </Button>
-          )}
+          <Button 
+            variant="outline" 
+            onClick={onBackToList}
+            className="w-1/3"
+          >
+            Cancel
+          </Button>
           
           <Button 
             onClick={handleGenerateQuotation} 
-            className={userRole === "approver" ? "w-2/3" : "w-full"}
+            className="w-2/3"
             disabled={isGenerating || userRequirements.trim() === ''}
           >
             {isGenerating ? (

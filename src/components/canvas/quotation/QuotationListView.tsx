@@ -30,12 +30,13 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
   
   const hasQuotations = quotations.length > 0;
   const canSeeArchived = userRole === "itAdmin" || userRole === "seniorManagement";
+  const canCreateQuotation = userRole === "requestor" || userRole === "approver" || userRole === "seniorManagement";
 
   return (
     <>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Facility Management Quotations</h2>
-        {userRole === "requestor" && (
+        {canCreateQuotation && (
           <Button onClick={onCreateNew}>
             <PlusCircle className="h-4 w-4 mr-2" /> Create New
           </Button>
@@ -55,7 +56,7 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
         </Tabs>
       )}
 
-      {!hasQuotations && userRole === "requestor" ? (
+      {!hasQuotations && canCreateQuotation ? (
         <Card className="p-6 text-center">
           <p className="text-muted-foreground mb-4">You haven't created any quotations yet</p>
           <Button onClick={onCreateNew}>
