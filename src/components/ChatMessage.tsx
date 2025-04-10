@@ -4,6 +4,8 @@ import { Avatar } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRightCircle, Copy, MessageSquare, User, CheckCheck } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export interface MessageType {
   id: string;
@@ -92,7 +94,30 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             )}
           </Button>
         </div>
-        <div className="mt-1 text-sm whitespace-pre-wrap">{content}</div>
+        <div className="mt-1 text-sm whitespace-pre-wrap markdown-content">
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]} 
+            className={cn(
+              "prose max-w-none",
+              isUser ? "prose-invert" : "prose-gray"
+            )}
+            components={{
+              a: ({ node, ...props }) => <a {...props} className="text-kimyew-blue hover:underline" target="_blank" rel="noopener noreferrer" />,
+              code: ({ node, className, children, ...props }) => (
+                <code className={cn("bg-gray-200 rounded px-1 py-0.5", isUser ? "bg-opacity-20" : "", className)} {...props}>
+                  {children}
+                </code>
+              ),
+              pre: ({ node, children, ...props }) => (
+                <pre className="bg-gray-800 text-gray-100 p-3 rounded-md overflow-auto my-2" {...props}>
+                  {children}
+                </pre>
+              )
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
         {actions && actions.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-2">
             {actions.map((action) => (
