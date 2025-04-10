@@ -1,18 +1,13 @@
 
 import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, PlusCircle, ArrowLeft } from "lucide-react";
-import { CanvasAction } from "@/utils/canvasInteraction";
 import { useToast } from "@/hooks/use-toast";
-
-// Import new component files
-import RequirementsInput from "./quotation/RequirementsInput";
-import SORSelector from "./quotation/SORSelector";
-import QuotationResult from "./quotation/QuotationResult";
-import PreviousQuotes from "./quotation/PreviousQuotes";
-import QuotationList from "./quotation/QuotationList";
+import { CanvasAction } from "@/utils/canvasInteraction";
 import { generateQuotation, QuotationResultType } from "./quotation/quotationUtils";
+
+// Import view components
+import QuotationListView from "./quotation/QuotationListView";
+import QuotationCreationView from "./quotation/QuotationCreationView";
+import QuotationDetailView from "./quotation/QuotationDetailView";
 
 interface QuotationTabProps {
   requirements?: string;
@@ -112,108 +107,47 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
   const handleQuotationUpdated = (updatedQuotation: QuotationResultType) => {
     setGeneratedQuotation(updatedQuotation);
   };
+  
+  const handleCreateNew = () => {
+    setCurrentView("create");
+  };
+  
+  const handleBackToList = () => {
+    setCurrentView("list");
+  };
 
   return (
     <div className="space-y-4">
       {currentView === "list" && (
-        <>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Facility Management Quotations</h2>
-            {userRole === "requestor" && (
-              <Button onClick={() => setCurrentView("create")}>
-                <PlusCircle className="h-4 w-4 mr-2" /> Create New
-              </Button>
-            )}
-          </div>
-          <QuotationList 
-            userRole={userRole} 
-            onSelectQuotation={handleSelectQuotation} 
-          />
-        </>
+        <QuotationListView 
+          userRole={userRole} 
+          onSelectQuotation={handleSelectQuotation} 
+          onCreateNew={handleCreateNew} 
+        />
       )}
 
       {currentView === "create" && !generatedQuotation && (
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            {userRole !== "requestor" && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="p-2 h-8 w-8" 
-                onClick={() => setCurrentView("list")}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            )}
-            <h2 className="text-xl font-semibold">Create New Quotation</h2>
-          </div>
-          
-          <RequirementsInput 
-            userRequirements={userRequirements}
-            setUserRequirements={setUserRequirements}
-          />
-          
-          <div className="mb-4">
-            <SORSelector 
-              selectedItems={selectedItems}
-              toggleSORItem={toggleSORItem}
-            />
-          </div>
-          
-          <div className="flex gap-3">
-            {userRole === "approver" && (
-              <Button 
-                variant="outline" 
-                onClick={() => setCurrentView("list")}
-                className="w-1/3"
-              >
-                Cancel
-              </Button>
-            )}
-            
-            <Button 
-              onClick={handleGenerateQuotation} 
-              className={userRole === "approver" ? "w-2/3" : "w-full"}
-              disabled={isGenerating || userRequirements.trim() === ''}
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                "Generate Quotation"
-              )}
-            </Button>
-          </div>
-        </Card>
+        <QuotationCreationView
+          userRequirements={userRequirements}
+          setUserRequirements={setUserRequirements}
+          selectedItems={selectedItems}
+          toggleSORItem={toggleSORItem}
+          isGenerating={isGenerating}
+          handleGenerateQuotation={handleGenerateQuotation}
+          previousQuotes={previousQuotes || []}
+          userRole={userRole}
+          onBackToList={handleBackToList}
+        />
       )}
 
-      {currentView === "detail" && generatedQuotation && (
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="p-2 h-8 w-8" 
-              onClick={() => setCurrentView("list")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h2 className="text-xl font-semibold">Quotation Details</h2>
-          </div>
-          
-          <QuotationResult 
-            quotation={generatedQuotation}
-            resetQuotation={resetQuotation}
-            userRole={userRole}
-            onQuotationUpdated={handleQuotationUpdated}
-          />
-        </Card>
-      )}
-      
-      {currentView === "create" && !generatedQuotation && (
-        <PreviousQuotes previousQuotes={previousQuotes || []} />
+      {(currentView === "detail" && generatedQuotation) && (
+        <QuotationDetailView
+          quotation={generatedQuotation}
+          resetQuotation={resetQuotation}
+          userRole={userRole}
+          onQuotationUpdated={handleQuotationUpdated}
+          onBackToList={handleBackToList}
+        />
       )}
     </div>
   );
