@@ -124,6 +124,9 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
   };
   
   const handleCreateNew = () => {
+    // Reset the form state when creating a new quotation
+    setUserRequirements("");
+    setSelectedItems([]);
     setGeneratedQuotation(null);
     setCurrentView("create");
   };
