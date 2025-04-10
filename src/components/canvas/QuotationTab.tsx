@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CanvasAction } from "@/utils/canvasInteraction";
-import { generateQuotation, QuotationResultType } from "./quotation/quotationUtils";
+import { generateQuotation, QuotationResultType, saveQuotation } from "./quotation/quotationUtils";
 
 // Import view components
 import QuotationListView from "./quotation/QuotationListView";
@@ -92,12 +93,15 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
     setTimeout(() => {
       const userDisplayName = userRole.charAt(0).toUpperCase() + userRole.slice(1);
       const quotation = generateQuotation(userRequirements, selectedItems, userDisplayName);
-      setGeneratedQuotation(quotation);
+      
+      // Save the quotation immediately to ensure it has a valid ID
+      const savedQuotation = saveQuotation(quotation);
+      setGeneratedQuotation(savedQuotation);
       setIsGenerating(false);
       
       toast({
         title: "Quotation Generated",
-        description: "Your quotation has been successfully generated.",
+        description: "Your quotation has been successfully generated and saved as a draft.",
       });
       
       // Switch to detail view to see the generated quotation

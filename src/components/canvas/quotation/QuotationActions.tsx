@@ -63,7 +63,11 @@ const QuotationActions: React.FC<QuotationActionsProps> = ({
               <Button onClick={onSave} variant="outline" className="w-1/2">
                 Save as Draft
               </Button>
-              <Button onClick={onSubmitForApproval} className="w-1/2">
+              <Button 
+                onClick={onSubmitForApproval} 
+                className="w-1/2"
+                disabled={!quotation.id} // Disable if no ID exists
+              >
                 Submit for Approval
               </Button>
             </div>
