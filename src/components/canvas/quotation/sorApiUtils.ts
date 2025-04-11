@@ -23,7 +23,7 @@ export function parseSORResponse(responseText: string): SORItem[] {
   // - Rate: SGD 132.00
   
   // Split by item sections (often separated by double newlines or headers)
-  const sections = responseText.split(/\n\n|\n###|\n\*\*/).filter(Boolean);
+  const sections = responseText.split(/\n\n|\n###|\n\*\*|\nItem \d+/i).filter(Boolean);
   
   for (const section of sections) {
     const itemCode = section.match(/(?:Item Code|Code):\s*([A-Za-z0-9-]+)/i)?.[1];
@@ -71,13 +71,21 @@ Return:
 - Item Code
 - Description of Works
 - Unit
-- Rate (SGD)`;
+- Rate (SGD)
+
+Format each item as:
+### Item X
+- Item Code: [code]
+- Description of Works: [description]
+- Unit: [unit]
+- Rate: [rate]`;
 
     // Call the chat API with this prompt, using 'requestor' as the session ID
     const response = await query(prompt, "requestor");
     
     // Parse the response to extract SOR items
     const sorItems = parseSORResponse(response);
+    console.log("API returned SOR items:", sorItems);
     
     return sorItems;
   } catch (error) {

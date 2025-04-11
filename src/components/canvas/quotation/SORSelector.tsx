@@ -2,16 +2,20 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { CheckCircle, PlusCircle } from "lucide-react";
+import { SORItem } from "./sorApiUtils";
 
 interface SORSelectorProps {
   selectedItems: string[];
   toggleSORItem: (item: string) => void;
+  retrievedSORItems?: SORItem[];
 }
 
 const SORSelector: React.FC<SORSelectorProps> = ({
   selectedItems,
-  toggleSORItem
+  toggleSORItem,
+  retrievedSORItems = []
 }) => {
   const facilityManagementItems = [
     "Maintenance & Inspection",
@@ -29,20 +33,42 @@ const SORSelector: React.FC<SORSelectorProps> = ({
   ];
 
   return (
-    <div>
-      <Label className="text-sm font-medium mb-2 block">Facility Management Services</Label>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {facilityManagementItems.map((item) => (
-          <Badge 
-            key={item}
-            variant={selectedItems.includes(item) ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => toggleSORItem(item)}
-          >
-            {selectedItems.includes(item) ? <CheckCircle className="h-3 w-3 mr-1" /> : <PlusCircle className="h-3 w-3 mr-1" />}
-            {item}
-          </Badge>
-        ))}
+    <div className="space-y-4">
+      {retrievedSORItems.length > 0 && (
+        <div className="mb-4">
+          <Label className="text-sm font-medium mb-2 block">Retrieved SOR Items</Label>
+          <Card className="p-3 bg-slate-50">
+            <div className="space-y-2">
+              {retrievedSORItems.map((item, index) => (
+                <div key={`sor-${index}`} className="flex items-start text-sm">
+                  <div className="w-20 font-medium">{item.itemCode}</div>
+                  <div className="flex-1">{item.description}</div>
+                  <div className="w-16 text-right">$ {item.rate.toFixed(2)}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 text-xs text-slate-500">
+              These items will be automatically included in your quotation
+            </div>
+          </Card>
+        </div>
+      )}
+      
+      <div>
+        <Label className="text-sm font-medium mb-2 block">Facility Management Services</Label>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {facilityManagementItems.map((item) => (
+            <Badge 
+              key={item}
+              variant={selectedItems.includes(item) ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => toggleSORItem(item)}
+            >
+              {selectedItems.includes(item) ? <CheckCircle className="h-3 w-3 mr-1" /> : <PlusCircle className="h-3 w-3 mr-1" />}
+              {item}
+            </Badge>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -5,7 +6,7 @@ import { QuotationResultType } from "./types";
 import QuotationHeader from "./QuotationHeader";
 import StatusProgressBar from "./StatusProgressBar";
 import LineItemsTable from "./LineItemsTable";
-import QuotationActionsComponent from "./QuotationActions.tsx";
+import QuotationActionsComponent from "./QuotationActions";
 import { 
   saveQuotation, 
   submitForApproval,

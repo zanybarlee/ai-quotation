@@ -19,18 +19,20 @@ const LineItemsTable: React.FC<LineItemsTableProps> = ({ quotation }) => {
             <th className="px-4 py-2 text-sm font-medium text-right">Quantity</th>
             <th className="px-4 py-2 text-sm font-medium text-right">Rate</th>
             <th className="px-4 py-2 text-sm font-medium text-right">Amount</th>
+            <th className="px-4 py-2 text-sm font-medium text-right">Hours</th>
           </tr>
         </thead>
         <tbody>
           {quotation.lineItems.map((item, index) => (
             <tr key={index} className="border-b last:border-0">
               <td className="px-4 py-2">{index + 1}</td>
-              <td className="px-4 py-2">{item.sor || ""}</td>
+              <td className="px-4 py-2 font-medium">{item.sor || ""}</td>
               <td className="px-4 py-2">{item.item}</td>
               <td className="px-4 py-2">{item.unit || "No"}</td>
               <td className="px-4 py-2 text-right">{item.quantity?.toFixed(2) || "1.00"}</td>
               <td className="px-4 py-2 text-right">${item.rate.toFixed(2)}</td>
               <td className="px-4 py-2 text-right font-medium">${item.cost.toLocaleString()}</td>
+              <td className="px-4 py-2 text-right">{item.hours || 0}</td>
             </tr>
           ))}
         </tbody>
@@ -38,6 +40,7 @@ const LineItemsTable: React.FC<LineItemsTableProps> = ({ quotation }) => {
           <tr>
             <td colSpan={6} className="px-4 py-2 text-right">Total</td>
             <td className="px-4 py-2 text-right">${quotation.totalCost.toLocaleString()}</td>
+            <td className="px-4 py-2 text-right">{quotation.estimatedHours}</td>
           </tr>
         </tfoot>
       </table>

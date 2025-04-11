@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import RequirementsInput from "./RequirementsInput";
 import SORSelector from "./SORSelector";
 import PreviousQuotes from "./PreviousQuotes";
+import { SORItem } from "./sorApiUtils";
 
 interface QuotationCreationViewProps {
   userRequirements: string;
@@ -18,6 +19,7 @@ interface QuotationCreationViewProps {
   previousQuotes: string[];
   userRole: string;
   onBackToList: () => void;
+  retrievedSORItems?: SORItem[];
 }
 
 const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
@@ -29,7 +31,8 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
   handleGenerateQuotation,
   previousQuotes,
   userRole,
-  onBackToList
+  onBackToList,
+  retrievedSORItems = []
 }) => {
   const { toast } = useToast();
   const showBackButton = true; // Always show back button for all roles now
@@ -73,6 +76,7 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
           <SORSelector 
             selectedItems={selectedItems}
             toggleSORItem={toggleSORItem}
+            retrievedSORItems={retrievedSORItems}
           />
         </div>
         

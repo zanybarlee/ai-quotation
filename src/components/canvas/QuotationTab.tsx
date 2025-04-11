@@ -31,6 +31,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
     isGenerating,
     currentView,
     generatedQuotation,
+    retrievedSORItems,
     
     setUserRequirements,
     
@@ -71,6 +72,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
           previousQuotes={previousQuotes || []}
           userRole={userRole}
           onBackToList={handleBackToList}
+          retrievedSORItems={retrievedSORItems}
         />
       )}
 
