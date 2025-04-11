@@ -40,6 +40,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
     handleGenerateQuotation,
     handleSearchSOR,
     handleSORItemSelectionChange,
+    handleSORItemQuantityChange,
     resetQuotation,
     handleSelectQuotation,
     handleQuotationUpdated,
@@ -77,6 +78,7 @@ const QuotationTab: React.FC<QuotationTabProps> = ({
           onBackToList={handleBackToList}
           retrievedSORItems={retrievedSORItems}
           onSORItemSelectionChange={handleSORItemSelectionChange}
+          onSORItemQuantityChange={handleSORItemQuantityChange}
           isSearchingSOR={isSearchingSOR}
           handleSearchSOR={handleSearchSOR}
         />

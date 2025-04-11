@@ -12,13 +12,15 @@ interface SORSelectorProps {
   toggleSORItem: (item: string) => void;
   retrievedSORItems: SORItem[];
   onSORItemSelectionChange: (index: number, selected: boolean) => void;
+  onSORItemQuantityChange?: (index: number, quantity: number) => void;
 }
 
 const SORSelector: React.FC<SORSelectorProps> = ({
   selectedItems,
   toggleSORItem,
   retrievedSORItems,
-  onSORItemSelectionChange
+  onSORItemSelectionChange,
+  onSORItemQuantityChange
 }) => {
   const facilityManagementItems = [
     "Maintenance & Inspection",
@@ -45,6 +47,7 @@ const SORSelector: React.FC<SORSelectorProps> = ({
             <SORItemsTable 
               items={retrievedSORItems} 
               onItemSelectionChange={onSORItemSelectionChange}
+              onItemQuantityChange={onSORItemQuantityChange}
             />
           </Card>
         </div>

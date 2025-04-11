@@ -1,4 +1,3 @@
-
 import { query } from "@/utils/chatApi";
 
 export interface SORItem {
@@ -6,7 +5,8 @@ export interface SORItem {
   description: string;
   unit: string;
   rate: number;
-  selected?: boolean; // Added selected property
+  selected?: boolean;
+  quantity?: number;
 }
 
 /**
@@ -31,7 +31,8 @@ export function parseSORResponse(responseText: string): SORItem[] {
           description: item.description || item.description_of_works || '',
           unit: item.unit || 'No',
           rate: parseFloat(String(item.rate).replace(/[^0-9.]/g, '')) || 0,
-          selected: false
+          selected: false,
+          quantity: 0
         }));
       }
     } catch (error) {
@@ -50,7 +51,8 @@ export function parseSORResponse(responseText: string): SORItem[] {
         description: item.description || item.description_of_works || '',
         unit: item.unit || 'No',
         rate: parseFloat(String(item.rate).replace(/[^0-9.]/g, '')) || 0,
-        selected: false
+        selected: false,
+        quantity: 0
       }));
     }
     
@@ -61,7 +63,8 @@ export function parseSORResponse(responseText: string): SORItem[] {
         description: item.description || item.description_of_works || '',
         unit: item.unit || 'No',
         rate: parseFloat(String(item.rate).replace(/[^0-9.]/g, '')) || 0,
-        selected: false
+        selected: false,
+        quantity: 0
       }));
     }
   } catch (error) {
@@ -95,7 +98,8 @@ export function parseSORResponse(responseText: string): SORItem[] {
         description: description || itemCode,
         unit: unit || "No",
         rate: isNaN(rate) ? 0 : rate,
-        selected: false // Default to not selected
+        selected: false,
+        quantity: 0
       });
     }
   }
@@ -121,13 +125,15 @@ IMPORTANT: Return the results in a structured JSON array format, with each item 
     "itemCode": "SME-1-1-6", 
     "description": "Wiring of 2 x 1.5mm sq. PVC cable to lighting point",
     "unit": "No",
-    "rate": 162.00
+    "rate": 162.00,
+    "quantity": 0
   },
   {
     "itemCode": "...", 
     "description": "...",
     "unit": "...",
-    "rate": ...
+    "rate": ...,
+    "quantity": 0
   }
 ]`;
 

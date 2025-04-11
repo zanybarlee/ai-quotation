@@ -28,6 +28,7 @@ export function useQuotationState({
     retrievedSORItems, 
     isSearchingSOR, 
     handleSORItemSelectionChange, 
+    handleSORItemQuantityChange,
     handleSearchSOR 
   } = useSORItems();
   
@@ -90,6 +91,7 @@ export function useQuotationState({
     handleGenerateQuotation,
     handleSearchSOR: handleSearchSORWrapper,
     handleSORItemSelectionChange,
+    handleSORItemQuantityChange,
     resetQuotation,
     handleSelectQuotation,
     handleQuotationUpdated,

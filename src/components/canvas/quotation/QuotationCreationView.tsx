@@ -21,6 +21,7 @@ interface QuotationCreationViewProps {
   onBackToList: () => void;
   retrievedSORItems: SORItem[];
   onSORItemSelectionChange: (index: number, selected: boolean) => void;
+  onSORItemQuantityChange?: (index: number, quantity: number) => void;
   isSearchingSOR: boolean;
   handleSearchSOR: () => Promise<void>;
 }
@@ -37,6 +38,7 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
   onBackToList,
   retrievedSORItems,
   onSORItemSelectionChange,
+  onSORItemQuantityChange,
   isSearchingSOR,
   handleSearchSOR
 }) => {
@@ -103,6 +105,7 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
             toggleSORItem={toggleSORItem}
             retrievedSORItems={retrievedSORItems}
             onSORItemSelectionChange={onSORItemSelectionChange}
+            onSORItemQuantityChange={onSORItemQuantityChange}
           />
         </div>
         

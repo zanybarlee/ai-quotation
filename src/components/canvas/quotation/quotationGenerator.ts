@@ -14,21 +14,23 @@ export const generateQuotation = async (
   const randomClient = clientOptions[Math.floor(Math.random() * clientOptions.length)];
   
   // Create line items from the SOR data
-  const lineItems = sorItems.map(sorItem => {
-    // Generate a random reasonable quantity based on the item
-    const quantity = parseFloat((Math.random() * 2 + 0.5).toFixed(2));
-    const cost = Math.round(sorItem.rate * quantity);
-    
-    return {
-      sor: sorItem.itemCode,
-      item: sorItem.description,
-      unit: sorItem.unit,
-      quantity: quantity,
-      rate: sorItem.rate,
-      cost: cost,
-      hours: 0 // Add the missing hours property with a default value
-    };
-  });
+  const lineItems = sorItems
+    .filter(sorItem => sorItem.selected)
+    .map(sorItem => {
+      // Use the user-specified quantity or default to a random one
+      const quantity = sorItem.quantity || parseFloat((Math.random() * 2 + 0.5).toFixed(2));
+      const cost = Math.round(sorItem.rate * quantity);
+      
+      return {
+        sor: sorItem.itemCode,
+        item: sorItem.description,
+        unit: sorItem.unit,
+        quantity: quantity,
+        rate: sorItem.rate,
+        cost: cost,
+        hours: Math.round(quantity) // Simplistic estimation of hours based on quantity
+      };
+    });
   
   // If no SOR items were found, create line items from the selected service categories
   if (lineItems.length === 0) {

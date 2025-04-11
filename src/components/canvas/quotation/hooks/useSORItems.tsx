@@ -11,6 +11,18 @@ export function useSORItems() {
   const handleSORItemSelectionChange = (index: number, selected: boolean) => {
     const updatedItems = [...retrievedSORItems];
     updatedItems[index].selected = selected;
+    
+    // Initialize quantity to 1 when selected
+    if (selected && !updatedItems[index].quantity) {
+      updatedItems[index].quantity = 1;
+    }
+    
+    setRetrievedSORItems(updatedItems);
+  };
+  
+  const handleSORItemQuantityChange = (index: number, quantity: number) => {
+    const updatedItems = [...retrievedSORItems];
+    updatedItems[index].quantity = quantity;
     setRetrievedSORItems(updatedItems);
   };
 
@@ -63,6 +75,7 @@ export function useSORItems() {
     retrievedSORItems,
     isSearchingSOR,
     handleSORItemSelectionChange,
+    handleSORItemQuantityChange,
     handleSearchSOR
   };
 }
