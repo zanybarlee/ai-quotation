@@ -9,13 +9,19 @@ interface UseQuotationViewsProps {
 }
 
 export function useQuotationViews({ userRole = "requestor" }: UseQuotationViewsProps) {
-  const [currentView, setCurrentView] = useState<QuotationView>("list");
+  const [currentView, setCurrentView] = useState<QuotationView>("welcome");
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationResultType | null>(null);
 
   // Set initial view based on user role - only once when component mounts
   useEffect(() => {
-    // Start directly with the list view for everyone
-    setCurrentView("list");
+    // Start with welcome screen for first-time visitors
+    const hasVisitedBefore = localStorage.getItem("hasVisitedQuotationModule");
+    if (hasVisitedBefore) {
+      setCurrentView("list");
+    } else {
+      localStorage.setItem("hasVisitedQuotationModule", "true");
+      setCurrentView("welcome");
+    }
   }, [userRole]);
 
   const resetQuotation = () => {

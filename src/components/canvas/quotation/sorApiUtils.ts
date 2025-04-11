@@ -15,7 +15,31 @@ export interface SORItem {
  * @returns Array of parsed SOR items
  */
 export function parseSORResponse(responseText: string): SORItem[] {
-  // First try parsing as JSON
+  console.log("Parsing response text:", responseText);
+  
+  // First try to extract JSON from markdown code blocks (```json ... ```)
+  const jsonBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (jsonBlockMatch && jsonBlockMatch[1]) {
+    try {
+      const extractedJsonText = jsonBlockMatch[1].trim();
+      console.log("Extracted JSON from code block:", extractedJsonText);
+      const jsonData = JSON.parse(extractedJsonText);
+      
+      if (Array.isArray(jsonData)) {
+        return jsonData.map(item => ({
+          itemCode: item.itemCode || item.item_code || '',
+          description: item.description || item.description_of_works || '',
+          unit: item.unit || 'No',
+          rate: parseFloat(String(item.rate).replace(/[^0-9.]/g, '')) || 0,
+          selected: false
+        }));
+      }
+    } catch (error) {
+      console.error("Error parsing JSON from markdown block:", error);
+    }
+  }
+  
+  // If not found in a code block, try parsing the entire response as JSON
   try {
     const jsonData = JSON.parse(responseText);
     
