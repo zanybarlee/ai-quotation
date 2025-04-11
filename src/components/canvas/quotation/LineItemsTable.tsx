@@ -28,7 +28,6 @@ const LineItemsTable: React.FC<LineItemsTableProps> = ({ quotation }) => {
             <TableHead className="text-sm font-medium text-right">Quantity</TableHead>
             <TableHead className="text-sm font-medium text-right">Rate</TableHead>
             <TableHead className="text-sm font-medium text-right">Amount</TableHead>
-            <TableHead className="text-sm font-medium text-right">Hours</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -41,7 +40,6 @@ const LineItemsTable: React.FC<LineItemsTableProps> = ({ quotation }) => {
               <TableCell className="text-right">{item.quantity?.toFixed(2) || "1.00"}</TableCell>
               <TableCell className="text-right">${item.rate.toFixed(2)}</TableCell>
               <TableCell className="text-right font-medium">${item.cost.toLocaleString()}</TableCell>
-              <TableCell className="text-right">{item.hours || 0}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -49,7 +47,6 @@ const LineItemsTable: React.FC<LineItemsTableProps> = ({ quotation }) => {
           <TableRow className="bg-slate-50 font-medium">
             <TableCell colSpan={6} className="text-right">Total</TableCell>
             <TableCell className="text-right">${quotation.totalCost.toLocaleString()}</TableCell>
-            <TableCell className="text-right">{quotation.estimatedHours}</TableCell>
           </TableRow>
         </TableFooter>
       </Table>
