@@ -6,6 +6,7 @@ export interface SORItem {
   description: string;
   unit: string;
   rate: number;
+  selected?: boolean; // Added selected property
 }
 
 /**
@@ -16,14 +17,9 @@ export interface SORItem {
 export function parseSORResponse(responseText: string): SORItem[] {
   const items: SORItem[] = [];
   
-  // Look for patterns like:
-  // - Item Code: SME-1-1-5
-  // - Description: One fan point controlled by one switch
-  // - Unit: No
-  // - Rate: SGD 132.00
-  
-  // Split by item sections (often separated by double newlines or headers)
-  const sections = responseText.split(/\n\n|\n###|\n\*\*|\nItem \d+/i).filter(Boolean);
+  // Split by item sections (often separated by descriptions like "Lighting Point", "Fan Point")
+  // This handles both numbered items (### Item X) and category headers (Lighting Point, Fan Point)
+  const sections = responseText.split(/\n\n|\n###|\n\*\*|\nItem \d+|(?:\n[A-Za-z]+ Point)/i).filter(Boolean);
   
   for (const section of sections) {
     const itemCode = section.match(/(?:Item Code|Code):\s*([A-Za-z0-9-]+)/i)?.[1];
@@ -44,7 +40,8 @@ export function parseSORResponse(responseText: string): SORItem[] {
         itemCode,
         description: description || itemCode,
         unit: unit || "No",
-        rate: isNaN(rate) ? 0 : rate
+        rate: isNaN(rate) ? 0 : rate,
+        selected: false // Default to not selected
       });
     }
   }
@@ -59,7 +56,7 @@ export function parseSORResponse(responseText: string): SORItem[] {
  */
 export async function fetchSORItems(requirements: string): Promise<SORItem[]> {
   try {
-    // Craft a prompt that asks for SOR items based on the requirements
+    // Use the direct query from the user
     const prompt = `Search the Schedule of Rates (SOR) database and return the most relevant item(s) based on the following requirements:
 
 ${requirements}
@@ -73,12 +70,11 @@ Return:
 - Unit
 - Rate (SGD)
 
-Format each item as:
-### Item X
-- Item Code: [code]
-- Description of Works: [description]
-- Unit: [unit]
-- Rate: [rate]`;
+Format each item clearly, for example:
+Item Code: SME-1-1-6
+Description of Works: Wiring of 2 x 1.5mm sq. PVC cable to lighting point
+Unit: No
+Rate: SGD 162.00`;
 
     // Call the chat API with this prompt, using 'requestor' as the session ID
     const response = await query(prompt, "requestor");

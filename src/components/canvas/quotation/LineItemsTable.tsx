@@ -1,6 +1,15 @@
 
 import React from "react";
 import { QuotationResultType } from "./types";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow,
+  TableFooter
+} from "@/components/ui/table";
 
 interface LineItemsTableProps {
   quotation: QuotationResultType;
@@ -9,41 +18,41 @@ interface LineItemsTableProps {
 const LineItemsTable: React.FC<LineItemsTableProps> = ({ quotation }) => {
   return (
     <div className="rounded-md border overflow-hidden">
-      <table className="w-full text-left">
-        <thead className="border-b bg-slate-50">
-          <tr>
-            <th className="px-4 py-2 text-sm font-medium">S/No.</th>
-            <th className="px-4 py-2 text-sm font-medium">SOR</th>
-            <th className="px-4 py-2 text-sm font-medium">Description</th>
-            <th className="px-4 py-2 text-sm font-medium">Unit</th>
-            <th className="px-4 py-2 text-sm font-medium text-right">Quantity</th>
-            <th className="px-4 py-2 text-sm font-medium text-right">Rate</th>
-            <th className="px-4 py-2 text-sm font-medium text-right">Amount</th>
-            <th className="px-4 py-2 text-sm font-medium text-right">Hours</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-slate-50">
+            <TableHead className="text-sm font-medium">S/No.</TableHead>
+            <TableHead className="text-sm font-medium">SOR</TableHead>
+            <TableHead className="text-sm font-medium">Description</TableHead>
+            <TableHead className="text-sm font-medium">Unit</TableHead>
+            <TableHead className="text-sm font-medium text-right">Quantity</TableHead>
+            <TableHead className="text-sm font-medium text-right">Rate</TableHead>
+            <TableHead className="text-sm font-medium text-right">Amount</TableHead>
+            <TableHead className="text-sm font-medium text-right">Hours</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {quotation.lineItems.map((item, index) => (
-            <tr key={index} className="border-b last:border-0">
-              <td className="px-4 py-2">{index + 1}</td>
-              <td className="px-4 py-2 font-medium">{item.sor || ""}</td>
-              <td className="px-4 py-2">{item.item}</td>
-              <td className="px-4 py-2">{item.unit || "No"}</td>
-              <td className="px-4 py-2 text-right">{item.quantity?.toFixed(2) || "1.00"}</td>
-              <td className="px-4 py-2 text-right">${item.rate.toFixed(2)}</td>
-              <td className="px-4 py-2 text-right font-medium">${item.cost.toLocaleString()}</td>
-              <td className="px-4 py-2 text-right">{item.hours || 0}</td>
-            </tr>
+            <TableRow key={index}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell className="font-medium">{item.sor || ""}</TableCell>
+              <TableCell>{item.description || item.item}</TableCell>
+              <TableCell>{item.unit || "No"}</TableCell>
+              <TableCell className="text-right">{item.quantity?.toFixed(2) || "1.00"}</TableCell>
+              <TableCell className="text-right">${item.rate.toFixed(2)}</TableCell>
+              <TableCell className="text-right font-medium">${item.cost.toLocaleString()}</TableCell>
+              <TableCell className="text-right">{item.hours || 0}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-        <tfoot className="bg-slate-50 font-medium">
-          <tr>
-            <td colSpan={6} className="px-4 py-2 text-right">Total</td>
-            <td className="px-4 py-2 text-right">${quotation.totalCost.toLocaleString()}</td>
-            <td className="px-4 py-2 text-right">{quotation.estimatedHours}</td>
-          </tr>
-        </tfoot>
-      </table>
+        </TableBody>
+        <TableFooter>
+          <TableRow className="bg-slate-50 font-medium">
+            <TableCell colSpan={6} className="text-right">Total</TableCell>
+            <TableCell className="text-right">${quotation.totalCost.toLocaleString()}</TableCell>
+            <TableCell className="text-right">{quotation.estimatedHours}</TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table>
     </div>
   );
 };

@@ -5,17 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, PlusCircle } from "lucide-react";
 import { SORItem } from "./sorApiUtils";
+import SORItemsTable from "./SORItemsTable";
 
 interface SORSelectorProps {
   selectedItems: string[];
   toggleSORItem: (item: string) => void;
-  retrievedSORItems?: SORItem[];
+  retrievedSORItems: SORItem[];
+  onSORItemSelectionChange: (index: number, selected: boolean) => void;
 }
 
 const SORSelector: React.FC<SORSelectorProps> = ({
   selectedItems,
   toggleSORItem,
-  retrievedSORItems = []
+  retrievedSORItems,
+  onSORItemSelectionChange
 }) => {
   const facilityManagementItems = [
     "Maintenance & Inspection",
@@ -38,18 +41,11 @@ const SORSelector: React.FC<SORSelectorProps> = ({
         <div className="mb-4">
           <Label className="text-sm font-medium mb-2 block">Retrieved SOR Items</Label>
           <Card className="p-3 bg-slate-50">
-            <div className="space-y-2">
-              {retrievedSORItems.map((item, index) => (
-                <div key={`sor-${index}`} className="flex items-start text-sm">
-                  <div className="w-20 font-medium">{item.itemCode}</div>
-                  <div className="flex-1">{item.description}</div>
-                  <div className="w-16 text-right">$ {item.rate.toFixed(2)}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-2 text-xs text-slate-500">
-              These items will be automatically included in your quotation
-            </div>
+            <p className="text-sm mb-2">Select items to include in your quotation:</p>
+            <SORItemsTable 
+              items={retrievedSORItems} 
+              onItemSelectionChange={onSORItemSelectionChange}
+            />
           </Card>
         </div>
       )}

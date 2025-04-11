@@ -24,6 +24,7 @@ export function useQuotationState({
   const [userRequirements, setUserRequirements] = useState(initialRequirements);
   const [selectedItems, setSelectedItems] = useState<string[]>(initialSorItems);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSearchingSOR, setIsSearchingSOR] = useState(false);
   const [retrievedSORItems, setRetrievedSORItems] = useState<SORItem[]>([]);
   
   // View management
@@ -46,6 +47,58 @@ export function useQuotationState({
     }
   };
 
+  const handleSORItemSelectionChange = (index: number, selected: boolean) => {
+    const updatedItems = [...retrievedSORItems];
+    updatedItems[index].selected = selected;
+    setRetrievedSORItems(updatedItems);
+  };
+
+  const handleSearchSOR = async () => {
+    if (userRequirements.trim() === '') {
+      toast({
+        title: "Requirements needed",
+        description: "Please enter your query before searching the Schedule of Rates.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSearchingSOR(true);
+    
+    try {
+      // Call the Chat API to get SOR data based on requirements
+      toast({
+        title: "Searching SOR database",
+        description: "Looking for matching items in the Schedule of Rates...",
+      });
+      
+      const sorItems = await fetchSORItems(userRequirements);
+      setRetrievedSORItems(sorItems);
+      
+      if (sorItems.length > 0) {
+        toast({
+          title: "SOR data retrieved",
+          description: `Found ${sorItems.length} relevant service items.`,
+        });
+      } else {
+        toast({
+          title: "No relevant SOR items found",
+          description: "Try refining your search query or use the category selections below.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching SOR data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to search SOR database. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSearchingSOR(false);
+    }
+  };
+
   const handleGenerateQuotation = async () => {
     if (userRequirements.trim() === '') {
       toast({
@@ -56,10 +109,13 @@ export function useQuotationState({
       return;
     }
 
-    if (selectedItems.length === 0) {
+    // Check if either SOR items are selected or category items are selected
+    const anySORItemSelected = retrievedSORItems.some(item => item.selected);
+    
+    if (!anySORItemSelected && selectedItems.length === 0) {
       toast({
         title: "No items selected",
-        description: "Please select at least one item from Schedule of Rates.",
+        description: "Please select at least one SOR item or category to include in your quotation.",
         variant: "destructive"
       });
       return;
@@ -81,30 +137,17 @@ export function useQuotationState({
     }
     
     try {
-      // Call the Chat API to get SOR data based on requirements
-      toast({
-        title: "Retrieving SOR data",
-        description: "Searching for relevant facility management services...",
-      });
+      // Filter only the selected SOR items
+      const selectedSORItems = retrievedSORItems.filter(item => item.selected);
       
-      const sorItems = await fetchSORItems(userRequirements);
-      setRetrievedSORItems(sorItems);
-      
-      if (sorItems.length > 0) {
-        toast({
-          title: "SOR data retrieved",
-          description: `Found ${sorItems.length} relevant service items.`,
-        });
-      } else {
-        toast({
-          title: "No relevant SOR items found",
-          description: "Using selected categories to generate quotation instead.",
-        });
-      }
-      
-      // Generate a quotation based on requirements, selected items, and SOR data
+      // Generate a quotation based on requirements, selected categories, and selected SOR items
       const userDisplayName = userRole.charAt(0).toUpperCase() + userRole.slice(1);
-      const quotation = await generateQuotation(userRequirements, selectedItems, sorItems, userDisplayName);
+      const quotation = await generateQuotation(
+        userRequirements, 
+        selectedItems, 
+        selectedSORItems, 
+        userDisplayName
+      );
       
       // Save the quotation immediately to ensure it has a valid ID
       const savedQuotation = saveQuotation(quotation);
@@ -161,6 +204,7 @@ export function useQuotationState({
     userRequirements,
     selectedItems,
     isGenerating,
+    isSearchingSOR,
     currentView,
     generatedQuotation,
     retrievedSORItems,
@@ -171,6 +215,8 @@ export function useQuotationState({
     // Handlers
     toggleSORItem,
     handleGenerateQuotation,
+    handleSearchSOR,
+    handleSORItemSelectionChange,
     resetQuotation,
     handleSelectQuotation,
     handleQuotationUpdated,

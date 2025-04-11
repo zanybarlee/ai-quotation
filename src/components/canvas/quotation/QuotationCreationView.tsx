@@ -19,7 +19,10 @@ interface QuotationCreationViewProps {
   previousQuotes: string[];
   userRole: string;
   onBackToList: () => void;
-  retrievedSORItems?: SORItem[];
+  retrievedSORItems: SORItem[];
+  onSORItemSelectionChange: (index: number, selected: boolean) => void;
+  isSearchingSOR: boolean;
+  handleSearchSOR: () => Promise<void>;
 }
 
 const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
@@ -32,10 +35,13 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
   previousQuotes,
   userRole,
   onBackToList,
-  retrievedSORItems = []
+  retrievedSORItems,
+  onSORItemSelectionChange,
+  isSearchingSOR,
+  handleSearchSOR
 }) => {
   const { toast } = useToast();
-  const showBackButton = true; // Always show back button for all roles now
+  const showBackButton = true;
 
   const onGenerateClick = async () => {
     try {
@@ -72,11 +78,31 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
           setUserRequirements={setUserRequirements}
         />
         
+        {/* Add search SOR button */}
+        <div className="mb-4">
+          <Button
+            onClick={handleSearchSOR}
+            variant="outline"
+            className="w-full"
+            disabled={isSearchingSOR || userRequirements.trim() === ''}
+          >
+            {isSearchingSOR ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Searching SOR Database...
+              </>
+            ) : (
+              "Search Schedule of Rates"
+            )}
+          </Button>
+        </div>
+        
         <div className="mb-4">
           <SORSelector 
             selectedItems={selectedItems}
             toggleSORItem={toggleSORItem}
             retrievedSORItems={retrievedSORItems}
+            onSORItemSelectionChange={onSORItemSelectionChange}
           />
         </div>
         
