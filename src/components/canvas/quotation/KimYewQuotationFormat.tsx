@@ -11,10 +11,10 @@ const KimYewQuotationFormat: React.FC<KimYewQuotationFormatProps> = ({ quotation
   const gstAmount = quotation.totalCost * 0.09;
   const totalWithGST = quotation.totalCost + gstAmount;
   
-  // Format date
+  // Format date - using correct month format 'short' instead of 'MMM'
   const formatDate = (date: Date | undefined) => {
-    if (!date) return new Date().toLocaleDateString('en-SG', { day: '2-digit', month: 'MMM', year: 'numeric' });
-    return date.toLocaleDateString('en-SG', { day: '2-digit', month: 'MMM', year: 'numeric' });
+    if (!date) return new Date().toLocaleDateString('en-SG', { day: '2-digit', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString('en-SG', { day: '2-digit', month: 'short', year: 'numeric' });
   };
   
   // Convert number to words (simplified version)
