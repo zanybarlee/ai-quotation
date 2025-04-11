@@ -22,7 +22,7 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
   const [quotations, setQuotations] = useState<QuotationResultType[]>([]);
   // Add a state to track whether to show archived quotations (for IT Admin)
   const [showArchived, setShowArchived] = useState<boolean>(false);
-  // Add a state to track whether to show draft quotations (for Requestor)
+  // Add a state to track whether to show draft quotations (for Requestor and Approver)
   const [showDraftsOnly, setShowDraftsOnly] = useState<boolean>(false);
   
   useEffect(() => {
@@ -32,7 +32,7 @@ const QuotationListView: React.FC<QuotationListViewProps> = ({
   
   const hasQuotations = quotations.length > 0;
   const canSeeArchived = userRole === "itAdmin" || userRole === "seniorManagement";
-  const canManageDrafts = userRole === "requestor";
+  const canManageDrafts = userRole === "requestor" || userRole === "approver";
   const canCreateQuotation = userRole === "requestor" || userRole === "approver" || userRole === "seniorManagement";
 
   return (

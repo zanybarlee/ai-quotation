@@ -37,8 +37,9 @@ const QuotationList: React.FC<QuotationListProps> = ({
     // Get the appropriate list of quotations based on user role
     let loadedQuotations: QuotationResultType[] = [];
     
-    if (showDraftsOnly && userRole === "requestor") {
-      loadedQuotations = getDraftQuotations();
+    if (showDraftsOnly) {
+      // When showing drafts, only show those created by the current user role
+      loadedQuotations = getDraftQuotations(userRole, `${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`);
     } else if (userRole === "approver") {
       loadedQuotations = getPendingQuotations();
     } else if ((userRole === "itAdmin" || userRole === "seniorManagement") && showArchived) {
@@ -46,7 +47,11 @@ const QuotationList: React.FC<QuotationListProps> = ({
     } else if (userRole === "itAdmin" || userRole === "seniorManagement") {
       loadedQuotations = getAllQuotations(); // IT Admin and Senior Management can see all, including archived
     } else {
-      loadedQuotations = getNonArchivedQuotations(); // Other roles see only non-archived
+      // For regular users (requestor), show non-archived quotations excluding other users' drafts
+      loadedQuotations = getNonArchivedQuotations().filter(q => 
+        q.status !== "draft" || 
+        q.createdBy === `${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`
+      );
     }
     
     setQuotations(loadedQuotations);

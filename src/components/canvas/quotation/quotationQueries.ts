@@ -17,9 +17,17 @@ export const getNonArchivedQuotations = (): QuotationResultType[] => {
   return getQuotationsState().filter(q => q.status !== "archived");
 };
 
-// Get draft quotations
-export const getDraftQuotations = (): QuotationResultType[] => {
-  return getQuotationsState().filter(q => q.status === "draft");
+// Get draft quotations for a specific user role
+export const getDraftQuotations = (userRole?: string, username?: string): QuotationResultType[] => {
+  return getQuotationsState().filter(q => {
+    // Only return drafts that belong to the current user role
+    return q.status === "draft" && 
+      // If we have a username, match the creator
+      (username ? q.createdBy === username : true) &&
+      // Filter by role-specific drafts (can be expanded for other roles)
+      (userRole === "approver" ? q.createdBy?.includes("Approver") : 
+       userRole === "requestor" ? q.createdBy?.includes("Requestor") : true);
+  });
 };
 
 // Get all quotations
