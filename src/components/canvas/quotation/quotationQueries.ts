@@ -17,6 +17,11 @@ export const getNonArchivedQuotations = (): QuotationResultType[] => {
   return getQuotationsState().filter(q => q.status !== "archived");
 };
 
+// Get draft quotations
+export const getDraftQuotations = (): QuotationResultType[] => {
+  return getQuotationsState().filter(q => q.status === "draft");
+};
+
 // Get all quotations
 export const getAllQuotations = (): QuotationResultType[] => {
   return [...getQuotationsState()];

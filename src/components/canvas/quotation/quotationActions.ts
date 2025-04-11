@@ -98,6 +98,18 @@ export const archiveQuotation = (quotationId: string): QuotationResultType | und
   return undefined;
 };
 
+// Delete a quotation (primarily for draft quotations)
+export const deleteQuotation = (quotationId: string): boolean => {
+  const quotations = getQuotationsState();
+  const filteredQuotations = quotations.filter(q => q.id !== quotationId);
+  
+  if (filteredQuotations.length < quotations.length) {
+    setQuotationsState(filteredQuotations);
+    return true;
+  }
+  return false;
+};
+
 // Clear all quotations (for testing/development purposes)
 export const clearAllQuotations = (): void => {
   setQuotationsState([]);

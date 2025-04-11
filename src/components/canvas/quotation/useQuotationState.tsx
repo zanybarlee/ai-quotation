@@ -82,6 +82,7 @@ export function useQuotationState({
     currentView,
     generatedQuotation,
     retrievedSORItems,
+    userRole,
     
     // Setters
     setUserRequirements,

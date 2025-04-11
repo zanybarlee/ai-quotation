@@ -5,28 +5,41 @@ import {
   getPendingQuotations,
   getNonArchivedQuotations,
   getArchivedQuotations,
+  getDraftQuotations,
   QuotationResultType 
 } from "./quotationUtils";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, CheckCircle, XCircle, FileEdit, Archive } from "lucide-react";
+import { Clock, CheckCircle, XCircle, FileEdit, Archive, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { deleteQuotation } from "./quotationActions";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuotationListProps {
   userRole: string;
   onSelectQuotation: (quotation: QuotationResultType) => void;
   showArchived?: boolean;
+  showDraftsOnly?: boolean;
 }
 
-const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotation, showArchived = false }) => {
+const QuotationList: React.FC<QuotationListProps> = ({ 
+  userRole, 
+  onSelectQuotation, 
+  showArchived = false,
+  showDraftsOnly = false
+}) => {
   // Use state to store quotations and force update when component loads
   const [quotations, setQuotations] = useState<QuotationResultType[]>([]);
+  const { toast } = useToast();
   
   useEffect(() => {
     // Get the appropriate list of quotations based on user role
     let loadedQuotations: QuotationResultType[] = [];
     
-    if (userRole === "approver") {
+    if (showDraftsOnly && userRole === "requestor") {
+      loadedQuotations = getDraftQuotations();
+    } else if (userRole === "approver") {
       loadedQuotations = getPendingQuotations();
     } else if ((userRole === "itAdmin" || userRole === "seniorManagement") && showArchived) {
       loadedQuotations = getArchivedQuotations();
@@ -37,17 +50,32 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
     }
     
     setQuotations(loadedQuotations);
-  }, [userRole, showArchived]);
+  }, [userRole, showArchived, showDraftsOnly]);
+
+  const handleDeleteQuotation = (quotationId: string) => {
+    if (!quotationId) return;
+    
+    deleteQuotation(quotationId);
+    // Update the list of quotations
+    setQuotations(quotations.filter(q => q.id !== quotationId));
+    
+    toast({
+      title: "Quotation Deleted",
+      description: "The draft quotation has been deleted successfully."
+    });
+  };
 
   if (quotations.length === 0) {
     return (
       <Card className="p-6 text-center">
         <p className="text-gray-500">
-          {userRole === "approver" 
-            ? "There are no pending quotations to review."
-            : (userRole === "itAdmin" || userRole === "seniorManagement") && showArchived
-            ? "There are no archived quotations."
-            : "No quotations have been created yet."}
+          {showDraftsOnly 
+            ? "You don't have any draft quotations."
+            : userRole === "approver" 
+              ? "There are no pending quotations to review."
+              : (userRole === "itAdmin" || userRole === "seniorManagement") && showArchived
+                ? "There are no archived quotations."
+                : "No quotations have been created yet."}
         </p>
       </Card>
     );
@@ -73,11 +101,13 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium mb-3">
-        {userRole === "approver" 
-          ? "Pending Quotations" 
-          : (userRole === "itAdmin" || userRole === "seniorManagement") && showArchived
-          ? "Archived Quotations"
-          : "Your Quotations"}
+        {showDraftsOnly
+          ? "Your Draft Quotations"
+          : userRole === "approver" 
+            ? "Pending Quotations" 
+            : (userRole === "itAdmin" || userRole === "seniorManagement") && showArchived
+              ? "Archived Quotations"
+              : "Your Quotations"}
       </h3>
       
       {quotations.map((quotation) => (
@@ -96,9 +126,33 @@ const QuotationList: React.FC<QuotationListProps> = ({ userRole, onSelectQuotati
                 {quotation.createdBy && ` • Created by: ${quotation.createdBy}`}
               </div>
             </div>
-            <Button size="sm" onClick={() => onSelectQuotation(quotation)}>
-              {userRole === "approver" ? "Review" : (userRole === "itAdmin" || userRole === "seniorManagement") ? "Manage" : "View"}
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={() => onSelectQuotation(quotation)}>
+                {userRole === "approver" ? "Review" : quotation.status === "draft" && userRole === "requestor" ? "Edit" : (userRole === "itAdmin" || userRole === "seniorManagement") ? "Manage" : "View"}
+              </Button>
+              
+              {quotation.status === "draft" && userRole === "requestor" && quotation.id && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="sm" variant="destructive">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Draft Quotation</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete this draft quotation? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDeleteQuotation(quotation.id!)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           </div>
         </Card>
       ))}
