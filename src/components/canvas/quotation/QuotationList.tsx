@@ -45,7 +45,7 @@ const QuotationList: React.FC<QuotationListProps> = ({
     } else if ((userRole === "itAdmin" || userRole === "seniorManagement") && showArchived) {
       loadedQuotations = getArchivedQuotations();
     } else if (userRole === "itAdmin" || userRole === "seniorManagement") {
-      loadedQuotations = getAllQuotations(); // IT Admin and Senior Management can see all, including archived
+      loadedQuotations = getAllQuotations(); // IT Admin and Senior Management see all EXCEPT drafts
     } else {
       // For regular users (requestor), show non-archived quotations excluding other users' drafts
       loadedQuotations = getNonArchivedQuotations().filter(q => 

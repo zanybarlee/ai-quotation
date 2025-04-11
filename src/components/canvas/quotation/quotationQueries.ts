@@ -32,7 +32,7 @@ export const getDraftQuotations = (userRole?: string, username?: string): Quotat
 
 // Get all quotations
 export const getAllQuotations = (): QuotationResultType[] => {
-  return [...getQuotationsState()];
+  return getQuotationsState().filter(q => q.status !== "draft"); // Exclude drafts for IT Admin and Senior Management
 };
 
 // Get a specific quotation by ID
