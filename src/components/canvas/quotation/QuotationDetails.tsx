@@ -5,7 +5,7 @@ import { QuotationResultType } from "./types";
 import QuotationHeader from "./QuotationHeader";
 import StatusProgressBar from "./StatusProgressBar";
 import LineItemsTable from "./LineItemsTable";
-import QuotationActions from "./QuotationActions";
+import QuotationActionsComponent from "./QuotationActions.tsx";
 import { 
   saveQuotation, 
   submitForApproval,
@@ -114,7 +114,7 @@ const QuotationDetails: React.FC<QuotationDetailsProps> = ({
         <h4 className="font-medium">Line Items</h4>
         <LineItemsTable quotation={quotation} />
         
-        <QuotationActions 
+        <QuotationActionsComponent 
           quotation={quotation}
           userRole={userRole}
           onSave={handleSaveQuotation}
