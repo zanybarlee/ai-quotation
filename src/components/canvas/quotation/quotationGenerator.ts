@@ -25,7 +25,8 @@ export const generateQuotation = async (
       unit: sorItem.unit,
       quantity: quantity,
       rate: sorItem.rate,
-      cost: cost
+      cost: cost,
+      hours: 0 // Add the missing hours property with a default value
     };
   });
   
@@ -37,6 +38,7 @@ export const generateQuotation = async (
       const rate = Math.round(baseRate);
       const quantity = parseFloat((Math.random() * 2 + 0.5).toFixed(2));
       const cost = Math.round(rate * quantity);
+      const hours = Math.round(complexity * (Math.random() * 5 + 1)); // Generate some hours
 
       lineItems.push({
         sor: `SOR-${Math.floor(Math.random() * 10)}-${Math.floor(Math.random() * 10)}-${Math.floor(Math.random() * 10)}`,
@@ -44,7 +46,8 @@ export const generateQuotation = async (
         unit: "No",
         quantity: quantity,
         rate: rate,
-        cost: cost
+        cost: cost,
+        hours: hours // Include hours in the line item
       });
     });
   }
