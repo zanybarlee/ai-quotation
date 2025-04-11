@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { QuotationResultType } from "./quotationUtils";
+import { QuotationResultType } from "./types";
 import QuotationHeader from "./QuotationHeader";
 import StatusProgressBar from "./StatusProgressBar";
 import LineItemsTable from "./LineItemsTable";
@@ -13,7 +12,7 @@ import {
   approveQuotation,
   rejectQuotation,
   archiveQuotation
-} from "./quotationUtils";
+} from "./quotationActions";
 import { useToast } from "@/hooks/use-toast";
 
 interface QuotationDetailsProps {
