@@ -14,7 +14,7 @@ interface QuotationCreationViewProps {
   selectedItems: string[];
   toggleSORItem: (item: string) => void;
   isGenerating: boolean;
-  handleGenerateQuotation: () => void;
+  handleGenerateQuotation: () => Promise<void>;
   previousQuotes: string[];
   userRole: string;
   onBackToList: () => void;
@@ -33,6 +33,19 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
 }) => {
   const { toast } = useToast();
   const showBackButton = true; // Always show back button for all roles now
+
+  const onGenerateClick = async () => {
+    try {
+      await handleGenerateQuotation();
+    } catch (error) {
+      console.error("Error generating quotation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate quotation. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <>
@@ -68,12 +81,13 @@ const QuotationCreationView: React.FC<QuotationCreationViewProps> = ({
             variant="outline" 
             onClick={onBackToList}
             className="w-1/3"
+            disabled={isGenerating}
           >
             Cancel
           </Button>
           
           <Button 
-            onClick={handleGenerateQuotation} 
+            onClick={onGenerateClick} 
             className="w-2/3"
             disabled={isGenerating || userRequirements.trim() === ''}
           >

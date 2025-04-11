@@ -43,9 +43,9 @@ export async function query(message: string, sessionId: string): Promise<string>
     }
     
     const result = await response.json();
-    return result.text;
+    return result.text || "";
   } catch (error) {
     console.error("Chat API error:", error);
-    return "Sorry, I couldn't process your request at the moment. Please try again later.";
+    throw new Error("Failed to fetch data from the chat API");
   }
 }

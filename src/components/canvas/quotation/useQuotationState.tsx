@@ -1,7 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { generateQuotation, QuotationResultType, saveQuotation } from "./quotationUtils";
+import { QuotationResultType } from "./types";
+import { generateQuotation } from "./quotationGenerator";
+import { saveQuotation } from "./quotationActions";
+import { fetchSORItems, SORItem } from "./sorApiUtils";
 import { CanvasAction } from "@/utils/canvasInteraction";
 
 export interface UseQuotationStateProps {
@@ -42,7 +45,7 @@ export function useQuotationState({
     }
   };
 
-  const handleGenerateQuotation = () => {
+  const handleGenerateQuotation = async () => {
     if (userRequirements.trim() === '') {
       toast({
         title: "Requirements needed",
@@ -76,10 +79,36 @@ export function useQuotationState({
       });
     }
     
-    // Generate a quotation based on requirements and selected items
-    setTimeout(() => {
+    let sorItems: SORItem[] = [];
+    
+    try {
+      // Call the Chat API to get SOR data based on requirements
+      toast({
+        title: "Retrieving SOR data",
+        description: "Searching for relevant facility management services...",
+      });
+      
+      sorItems = await fetchSORItems(userRequirements);
+      
+      if (sorItems.length > 0) {
+        toast({
+          title: "SOR data retrieved",
+          description: `Found ${sorItems.length} relevant service items.`,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching SOR data:", error);
+      toast({
+        title: "SOR data retrieval failed",
+        description: "Using default values instead.",
+        variant: "destructive"
+      });
+    }
+    
+    try {
+      // Generate a quotation based on requirements, selected items, and SOR data
       const userDisplayName = userRole.charAt(0).toUpperCase() + userRole.slice(1);
-      const quotation = generateQuotation(userRequirements, selectedItems, userDisplayName);
+      const quotation = await generateQuotation(userRequirements, selectedItems, sorItems, userDisplayName);
       
       // Save the quotation immediately to ensure it has a valid ID
       const savedQuotation = saveQuotation(quotation);
@@ -93,7 +122,15 @@ export function useQuotationState({
       
       // Switch to detail view to see the generated quotation
       setCurrentView("detail");
-    }, 1500);
+    } catch (error) {
+      console.error("Error generating quotation:", error);
+      setIsGenerating(false);
+      toast({
+        title: "Error",
+        description: "Failed to generate quotation. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const resetQuotation = () => {

@@ -1,30 +1,56 @@
 
 import { QuotationResultType } from "./types";
 import { baseHourRates, clientOptions } from "./baseData";
+import { SORItem } from "./sorApiUtils";
 
-// Generate a new quotation based on requirements and selected items
-export const generateQuotation = (requirements: string, selectedItems: string[], createdBy?: string): QuotationResultType => {
+// Generate a new quotation based on requirements, selected items, and SOR data
+export const generateQuotation = async (
+  requirements: string, 
+  selectedItems: string[], 
+  sorItems: SORItem[] = [],
+  createdBy?: string
+): Promise<QuotationResultType> => {
   // Select a random client for demonstration purposes
   const randomClient = clientOptions[Math.floor(Math.random() * clientOptions.length)];
   
-  const lineItems = selectedItems.map(item => {
-    const complexity = requirements.length / 100;
-    const baseHours = Math.max(4, Math.min(40, Math.floor(8 + Math.random() * 16)));
-    const hours = Math.ceil(baseHours * (0.8 + complexity * 0.4));
-    const rate = baseHourRates[item] || 75;
-    const cost = hours * rate;
-
+  // Create line items from the SOR data
+  const lineItems = sorItems.map(sorItem => {
+    // Generate a random reasonable quantity based on the item
+    const quantity = parseFloat((Math.random() * 2 + 0.5).toFixed(2));
+    const cost = Math.round(sorItem.rate * quantity);
+    
     return {
-      item,
-      hours,
-      rate,
-      cost,
-      description: `${item} - Professional facility management service including installation, maintenance, and quality assurance.`
+      sor: sorItem.itemCode,
+      item: sorItem.description,
+      unit: sorItem.unit,
+      quantity: quantity,
+      rate: sorItem.rate,
+      cost: cost
     };
   });
+  
+  // If no SOR items were found, create line items from the selected service categories
+  if (lineItems.length === 0) {
+    selectedItems.forEach(item => {
+      const complexity = requirements.length / 100;
+      const baseRate = baseHourRates[item] || 75;
+      const rate = Math.round(baseRate);
+      const quantity = parseFloat((Math.random() * 2 + 0.5).toFixed(2));
+      const cost = Math.round(rate * quantity);
 
-  const totalHours = lineItems.reduce((sum, item) => sum + item.hours, 0);
+      lineItems.push({
+        sor: `SOR-${Math.floor(Math.random() * 10)}-${Math.floor(Math.random() * 10)}-${Math.floor(Math.random() * 10)}`,
+        item: item,
+        unit: "No",
+        quantity: quantity,
+        rate: rate,
+        cost: cost
+      });
+    });
+  }
+
   const totalCost = lineItems.reduce((sum, item) => sum + item.cost, 0);
+  const totalHours = lineItems.reduce((sum, item) => sum + (item.hours || 0), 0);
 
   let title = "Facility Management Services";
   if (requirements.length > 10) {
@@ -43,7 +69,7 @@ export const generateQuotation = (requirements: string, selectedItems: string[],
     id,
     title,
     description: requirements,
-    estimatedHours: totalHours,
+    estimatedHours: totalHours || 0,
     totalCost,
     status: "draft",
     createdBy,

@@ -2,10 +2,13 @@
 // Type definitions for quotation management
 export interface LineItemType {
   item: string;
-  hours: number;
+  hours?: number;
   rate: number;
   cost: number;
   description?: string;
+  sor?: string;
+  unit?: string;
+  quantity?: number;
 }
 
 export interface QuotationResultType {
