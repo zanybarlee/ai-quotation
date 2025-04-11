@@ -1,4 +1,3 @@
-
 import React from "react";
 import { QuotationResultType } from "./quotationUtils";
 
@@ -26,7 +25,7 @@ const KimYewQuotationFormat: React.FC<KimYewQuotationFormatProps> = ({ quotation
   };
 
   return (
-    <div className="bg-white p-6 rounded-md shadow-sm border border-gray-200 print:shadow-none">
+    <div id="quotation-print-view" className="bg-white p-6 rounded-md shadow-sm border border-gray-200 print:shadow-none">
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-start">
