@@ -1,3 +1,4 @@
+
 import React from "react";
 import { QuotationResultType } from "./quotationUtils";
 
@@ -97,13 +98,13 @@ const KimYewQuotationFormat: React.FC<KimYewQuotationFormatProps> = ({ quotation
           {quotation.lineItems.map((item, index) => (
             <tr key={index}>
               <td className="border border-gray-300 px-2 py-1 text-center">{index + 1}</td>
-              <td className="border border-gray-300 px-2 py-1">SME-{index+1}-1-5</td>
+              <td className="border border-gray-300 px-2 py-1">{item.sor || `SME-${index+1}-1-5`}</td>
               <td className="border border-gray-300 px-2 py-1">
-                {item.item}
+                {item.description || item.item}
               </td>
-              <td className="border border-gray-300 px-2 py-1 text-center">No</td>
+              <td className="border border-gray-300 px-2 py-1 text-center">{item.unit || "No"}</td>
               <td className="border border-gray-300 px-2 py-1 text-center">
-                {(item.hours / 8).toFixed(2)}
+                {item.quantity?.toFixed(2) || "1.00"}
               </td>
               <td className="border border-gray-300 px-2 py-1 text-right">${item.rate.toFixed(2)}</td>
               <td className="border border-gray-300 px-2 py-1 text-right">${item.cost.toFixed(2)}</td>
