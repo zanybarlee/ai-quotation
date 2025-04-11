@@ -9,6 +9,7 @@ interface ChatQueryParams {
   question: string;
   overrideConfig: {
     sessionId: string;
+    responseFormat?: "json" | "text";
   };
 }
 
@@ -16,13 +17,15 @@ interface ChatQueryParams {
  * Send a query to the chat API
  * @param message - The message to send
  * @param sessionId - The session ID (role or user ID)
+ * @param responseFormat - Optional parameter to specify response format (json or text)
  * @returns The response from the API
  */
-export async function query(message: string, sessionId: string): Promise<string> {
+export async function query(message: string, sessionId: string, responseFormat: "json" | "text" = "text"): Promise<string> {
   const data: ChatQueryParams = {
     question: message,
     overrideConfig: {
       sessionId,
+      responseFormat,
     },
   };
 

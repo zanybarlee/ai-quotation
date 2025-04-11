@@ -15,6 +15,36 @@ export interface SORItem {
  * @returns Array of parsed SOR items
  */
 export function parseSORResponse(responseText: string): SORItem[] {
+  // First try parsing as JSON
+  try {
+    const jsonData = JSON.parse(responseText);
+    
+    // Check if the response is already an array of items with the expected structure
+    if (Array.isArray(jsonData)) {
+      return jsonData.map(item => ({
+        itemCode: item.itemCode || item.item_code || '',
+        description: item.description || item.description_of_works || '',
+        unit: item.unit || 'No',
+        rate: parseFloat(String(item.rate).replace(/[^0-9.]/g, '')) || 0,
+        selected: false
+      }));
+    }
+    
+    // Check if it's a nested structure with items inside
+    if (jsonData.items && Array.isArray(jsonData.items)) {
+      return jsonData.items.map(item => ({
+        itemCode: item.itemCode || item.item_code || '',
+        description: item.description || item.description_of_works || '',
+        unit: item.unit || 'No',
+        rate: parseFloat(String(item.rate).replace(/[^0-9.]/g, '')) || 0,
+        selected: false
+      }));
+    }
+  } catch (error) {
+    console.log("Not valid JSON format, continuing with text parsing");
+  }
+  
+  // Fallback to text parsing if JSON parsing fails
   const items: SORItem[] = [];
   
   // Split by item sections (often separated by descriptions like "Lighting Point", "Fan Point")
@@ -56,28 +86,30 @@ export function parseSORResponse(responseText: string): SORItem[] {
  */
 export async function fetchSORItems(requirements: string): Promise<SORItem[]> {
   try {
-    // Use the direct query from the user
+    // Request JSON format response from the API
     const prompt = `Search the Schedule of Rates (SOR) database and return the most relevant item(s) based on the following requirements:
 
 ${requirements}
 
-Instruction: Retrieve the item code, description of works, unit, and rate (in SGD) that best matches these requirements.
-Match based on work type, location (if given), and specific conditions.
-
-Return:
-- Item Code
-- Description of Works
-- Unit
-- Rate (SGD)
-
-Format each item clearly, for example:
-Item Code: SME-1-1-6
-Description of Works: Wiring of 2 x 1.5mm sq. PVC cable to lighting point
-Unit: No
-Rate: SGD 162.00`;
+IMPORTANT: Return the results in a structured JSON array format, with each item containing these exact fields:
+[
+  {
+    "itemCode": "SME-1-1-6", 
+    "description": "Wiring of 2 x 1.5mm sq. PVC cable to lighting point",
+    "unit": "No",
+    "rate": 162.00
+  },
+  {
+    "itemCode": "...", 
+    "description": "...",
+    "unit": "...",
+    "rate": ...
+  }
+]`;
 
     // Call the chat API with this prompt, using 'requestor' as the session ID
-    const response = await query(prompt, "requestor");
+    // Request JSON format if possible, but handle text format as fallback
+    const response = await query(prompt, "requestor", "json");
     
     // Parse the response to extract SOR items
     const sorItems = parseSORResponse(response);

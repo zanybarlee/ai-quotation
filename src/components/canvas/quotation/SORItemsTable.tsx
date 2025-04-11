@@ -28,15 +28,16 @@ const SORItemsTable: React.FC<SORItemsTableProps> = ({ items, onItemSelectionCha
         </TableHeader>
         <TableBody>
           {items.map((item, index) => (
-            <TableRow key={index}>
+            <TableRow key={index} className={item.selected ? "bg-slate-100" : ""}>
               <TableCell className="text-center">
                 <Checkbox
                   checked={item.selected}
                   onCheckedChange={(checked) => onItemSelectionChange(index, checked === true)}
+                  className="mx-auto"
                 />
               </TableCell>
               <TableCell className="font-medium">{item.itemCode}</TableCell>
-              <TableCell>{item.description}</TableCell>
+              <TableCell className="text-sm">{item.description}</TableCell>
               <TableCell>{item.unit}</TableCell>
               <TableCell className="text-right">${item.rate.toFixed(2)}</TableCell>
             </TableRow>
