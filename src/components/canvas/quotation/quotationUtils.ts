@@ -12,6 +12,8 @@ export * from './baseData';
 export {
   loadQuotationsFromStorage,
   saveQuotationsToStorage,
+  getQuotationsState,
+  setQuotationsState
 } from './storageUtils';
 
 // Re-export quotation generator
