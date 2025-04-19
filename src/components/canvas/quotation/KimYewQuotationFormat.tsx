@@ -42,8 +42,8 @@ const KimYewQuotationFormat: React.FC<KimYewQuotationFormatProps> = ({ quotation
           </div>
           <div>
             <h1 className="text-2xl font-bold">
-              <span className="text-red-600">Kim</span>
-              <span className="text-blue-600">Yew</span> 
+              <span className="text-red-600">Kim </span>
+              <span className="text-blue-600">Yew </span> 
               <span className="text-gray-700">Integrated Pte. Ltd.</span>
             </h1>
             <p className="text-sm text-gray-600">134 Tagore Lane, Singapore 787557</p>
