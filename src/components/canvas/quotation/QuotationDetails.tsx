@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -6,14 +5,8 @@ import { QuotationResultType } from "./types";
 import QuotationHeader from "./QuotationHeader";
 import StatusProgressBar from "./StatusProgressBar";
 import LineItemsTable from "./LineItemsTable";
-import QuotationActionsComponent from "./QuotationActions";
-import { 
-  saveQuotation, 
-  submitForApproval,
-  approveQuotation,
-  rejectQuotation,
-  archiveQuotation
-} from "./quotationActions";
+import QuotationActionsComponent from "./QuotationActions.tsx";
+import * as quotationActions from "./quotationActions";
 import { useToast } from "@/hooks/use-toast";
 
 interface QuotationDetailsProps {
@@ -32,7 +25,7 @@ const QuotationDetails: React.FC<QuotationDetailsProps> = ({
   const { toast } = useToast();
   
   const handleSaveQuotation = () => {
-    const savedQuote = saveQuotation(quotation);
+    const savedQuote = quotationActions.saveQuotation(quotation);
     toast({
       title: "Quotation Saved",
       description: `Quotation ${savedQuote.id} has been saved successfully.`
@@ -43,7 +36,7 @@ const QuotationDetails: React.FC<QuotationDetailsProps> = ({
   const handleSubmitForApproval = () => {
     if (!quotation.id) return;
     
-    const updatedQuote = submitForApproval(quotation.id);
+    const updatedQuote = quotationActions.submitForApproval(quotation.id);
     if (updatedQuote) {
       toast({
         title: "Quotation Submitted",
@@ -56,7 +49,7 @@ const QuotationDetails: React.FC<QuotationDetailsProps> = ({
   const handleApproveQuotation = (approverNotes: string) => {
     if (!quotation.id) return;
     
-    const updatedQuote = approveQuotation(quotation.id, approverNotes);
+    const updatedQuote = quotationActions.approveQuotation(quotation.id, approverNotes);
     if (updatedQuote) {
       toast({
         title: "Quotation Approved",
@@ -69,7 +62,7 @@ const QuotationDetails: React.FC<QuotationDetailsProps> = ({
   const handleRejectQuotation = (approverNotes: string) => {
     if (!quotation.id) return;
     
-    const updatedQuote = rejectQuotation(quotation.id, approverNotes);
+    const updatedQuote = quotationActions.rejectQuotation(quotation.id, approverNotes);
     if (updatedQuote) {
       toast({
         title: "Quotation Rejected",
@@ -82,7 +75,7 @@ const QuotationDetails: React.FC<QuotationDetailsProps> = ({
   const handleArchiveQuotation = () => {
     if (!quotation.id) return;
     
-    const updatedQuote = archiveQuotation(quotation.id);
+    const updatedQuote = quotationActions.archiveQuotation(quotation.id);
     if (updatedQuote) {
       toast({
         title: "Quotation Archived",
