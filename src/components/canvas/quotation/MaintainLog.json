@@ -1,0 +1,29 @@
+[
+  {
+    "id": "log_001",
+    "timestamp": "2025-03-15T14:23:00Z",
+    "sensor_id": "rack_3",
+    "temperature": 36.5,
+    "issue": "Temperature anomaly",
+    "maintenance_action": "Sensor recalibrated; fan speed increased",
+    "notes": "Temperature peaked at 36.5°C. Previous incident triggered maintenance within 2 hours and resolved in 3 hours."
+  },
+  {
+    "id": "log_002",
+    "timestamp": "2025-02-28T09:45:00Z",
+    "sensor_id": "rack_3",
+    "temperature": 37.2,
+    "issue": "High temperature warning",
+    "maintenance_action": "Performed full sensor check and maintenance on cooling unit",
+    "notes": "Temperature remained above threshold for 30 minutes. Maintenance was scheduled for immediate sensor calibration."
+  },
+  {
+    "id": "log_003",
+    "timestamp": "2025-01-20T18:12:00Z",
+    "sensor_id": "rack_2",
+    "temperature": 34.0,
+    "issue": "Minor temperature fluctuation",
+    "maintenance_action": "Monitored sensor; no immediate action required",
+    "notes": "No corrective action required. Alert resolved after 10 minutes."
+  }
+]
